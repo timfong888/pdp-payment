@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "client-contract": "git@github.com:FilOzone/client-contract.git",
+    "deal-bounty-contract": "git@github.com:FilOzone/deal-bounty-contract.git",
+    "pdp": "git@github.com:FilOzone/pdp.git",
+    "pdp-explorer": "git@github.com:FilOzone/pdp-explorer.git",
+    "dagparts": "git@github.com:FilOzone/dagparts.git",
+    "payments": "git@github.com:FilOzone/payments.git",
+    "fil-forwarder-frontend": "git@github.com:FilOzone/fil-forwarder-frontend.git",
+    "FilForwarder": "git@github.com:FilOzone/FilForwarder.git"
+  }
+}
