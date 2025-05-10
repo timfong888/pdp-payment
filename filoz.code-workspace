@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "payments"
+		},
+		{
+			"path": "client-contract"
+		},
+		{
+			"path": "deal-bounty-contract"
+		},
+		{
+			"path": "pdp"
+		},
+		{
+			"path": "pdp-explorer"
+		},
+		{
+			"path": "dagparts"
+		},
+		{
+			"path": "fil-forwarder-frontend"
+		},
+		{
+			"path": "FilForwarder"
+		}
+	]
+}
