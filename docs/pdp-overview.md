@@ -1,24 +1,43 @@
 # Understanding PDP (Provable Data Possession)
 
+<<<<<<< HEAD
 ## Overview
+=======
+This document provides an overview of the Provable Data Possession (PDP) system in FilOz.
+
+## What is PDP?
+>>>>>>> update-payment-rate-docs
 
 Provable Data Possession (PDP) is a cryptographic protocol that allows a client to verify that a storage provider still possesses the data they claim to be storing, without having to download the entire dataset. This is particularly important in decentralized storage networks like Filecoin, where clients need assurance that their data is being stored correctly.
 
 ## Key Components
 
+<<<<<<< HEAD
 ### PDPVerifier Contract
 
 The PDPVerifier contract is the core component of the PDP system. It:
 
 - Manages proof sets for multiple clients and storage providers
 - Generates challenges for storage providers to prove data possession
+=======
+The PDP system consists of several key components:
+
+### PDPVerifier Contract
+
+The PDPVerifier contract is the core component of the PDP system. It:
+- Creates and manages proof sets
+- Generates challenges for storage providers
+>>>>>>> update-payment-rate-docs
 - Verifies submitted proofs
 - Tracks compliance with SLA terms
 
 ### SimplePDPService Contract
 
 The SimplePDPService contract implements the SLA terms for the PDP system:
+<<<<<<< HEAD
 
+=======
+>>>>>>> update-payment-rate-docs
 - Defines proof frequency (maximum proving period)
 - Specifies the challenge window during which proofs must be submitted
 - Determines the number of challenges required per proof
@@ -27,7 +46,10 @@ The SimplePDPService contract implements the SLA terms for the PDP system:
 ### Proof Sets
 
 A proof set is a collection of data that a storage provider has committed to store:
+<<<<<<< HEAD
 
+=======
+>>>>>>> update-payment-rate-docs
 - Each proof set has a unique ID
 - Contains references to the data being stored (CIDs)
 - Tracks the owner (typically the storage provider)
@@ -66,6 +88,7 @@ The PDP system integrates with the payments system through:
 
 3. **Settlement**: When a rail is settled, the arbiter can reduce payments for providers who have failed to meet their PDP obligations.
 
+<<<<<<< HEAD
 ## Technical Details
 
 ### Proof Verification
@@ -96,3 +119,22 @@ The PDP system includes several security features:
 ## Next Steps
 
 To learn how to use PDP in practice, see the [Creating Your First Storage Deal](first-deal.md) guide.
+=======
+## Deployed Contracts
+
+The PDP service contract and the PDP verifier contracts are deployed on Filecoin Mainnet and Calibration Testnet.
+
+**Mainnet**
+- PDP Verifier: `0x9C65E8E57C98cCc040A3d825556832EA1e9f4Df6`
+- PDP Service: `0x805370387fA5Bd8053FD8f7B2da4055B9a4f8019`
+
+**Calibration Testnet**
+- PDP Verifier: `0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC`
+- PDP Service: `0x6170dE2b09b404776197485F3dc6c968Ef948505`
+
+## Next Steps
+
+- Learn more about [Creating a Proof Set](pdp/guides/creating-proof-set.md)
+- Understand how to [Submit Proofs](pdp/guides/submitting-proofs.md)
+- Explore the [Integration with Payments](integration/pdp-payments.md)
+>>>>>>> update-payment-rate-docs
