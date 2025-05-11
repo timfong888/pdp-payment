@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# FilOz Documentation
+# PDP-Payments (FWS) Documentation
 
 This repository contains comprehensive documentation for the FilOz ecosystem, including guides, tutorials, and technical specifications for all FilOz projects.
 
