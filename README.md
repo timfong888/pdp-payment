@@ -55,6 +55,7 @@ The integration between PDP and Payments enables:
 - [Payments Overview](docs/payments/concepts/overview.md): Detailed explanation of the Payments system
 - [Payment Rails](docs/payments/payment-rails.md): Documentation on payment rails
 - [Integration Guide](docs/integration/pdp-payments.md): Guide for integrating PDP with Payments
+- [System Diagrams](docs/diagrams.md): Visual representations of system architecture and workflows
 - [Quick Start](docs/quick-start.md): Quick start guide for developers
 - [Hot Vault Example](docs/examples/hot-vault.md): Example implementation
 
