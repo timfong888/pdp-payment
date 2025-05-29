@@ -4,6 +4,7 @@
 
 The FilOz Payments system is a flexible payment channel solution designed specifically for Filecoin storage deals. It enables ongoing payments between clients and storage providers with built-in arbitration capabilities to enforce Service Level Agreements (SLAs).
 
+<<<<<<< HEAD
 ## Key Features
 
 - **Payment Channels**: Create dedicated payment channels (rails) between payers and payees
@@ -16,6 +17,11 @@ The FilOz Payments system is a flexible payment channel solution designed specif
 ## Core Components
 
 ### [Payment Rails](payment-rails.md)
+=======
+## Key Components
+
+### Payment Rails
+>>>>>>> update-payment-rate-docs
 
 A payment rail is a payment channel between a payer (client) and a payee (storage provider) that allows for:
 
@@ -44,9 +50,13 @@ struct Rail {
 }
 ```
 
+<<<<<<< HEAD
 For more details on payment rails, see [Payment Rails](payment-rails.md).
 
 ### [Accounts](../api/account-management.md)
+=======
+### Accounts
+>>>>>>> update-payment-rate-docs
 
 The system tracks funds and lockups for each user:
 
@@ -59,9 +69,13 @@ struct Account {
 }
 ```
 
+<<<<<<< HEAD
 For more details on account management, see [Account Management](../api/account-management.md).
 
 ### [Arbitration](arbitration.md)
+=======
+### Arbitration
+>>>>>>> update-payment-rate-docs
 
 Arbiters can adjust payment amounts based on service performance:
 
@@ -85,8 +99,11 @@ interface IArbiter {
 }
 ```
 
+<<<<<<< HEAD
 For more details on arbitration, see [Arbitration](arbitration.md).
 
+=======
+>>>>>>> update-payment-rate-docs
 ## Core Functionality
 
 ### Creating a Rail
@@ -121,9 +138,33 @@ uint256 railId = payments.createRail(
 );
 ```
 
+<<<<<<< HEAD
 For a step-by-step guide on creating a rail, see [Setting Up a Payment Rail](../guides/first-rail.md).
 
 ### [Settlement Process](settlement.md)
+=======
+### Modifying a Rail
+
+Rails can be modified by the operator:
+
+```solidity
+// Change the lockup parameters
+payments.modifyRailLockup(
+    railId,
+    3600,     // New lockup period (1.25 days in epochs)
+    6000000   // New fixed lockup (6 USDC)
+);
+
+// Change the payment rate
+payments.modifyRailPayment(
+    railId,
+    1200000,  // New payment rate (1.2 USDC per epoch)
+    0         // No one-time payment
+);
+```
+
+### Settling Payments
+>>>>>>> update-payment-rate-docs
 
 Payments are settled using the `settleRail` function:
 
@@ -137,6 +178,7 @@ payments.settleRail(
 
 If an arbiter is specified, it will be called to potentially adjust the payment amount based on service performance.
 
+<<<<<<< HEAD
 For more details on the settlement process, see [Settlement Process](settlement.md).
 
 ### [Managing Rails](../guides/managing-rails.md)
@@ -151,23 +193,37 @@ payments.modifyRailPayment(
     0         // No one-time payment
 );
 
+=======
+### Terminating a Rail
+
+Rails can be terminated, preventing further payments after the lockup period:
+
+```solidity
+>>>>>>> update-payment-rate-docs
 // Terminate the rail
 payments.terminateRail(
     railId
 );
 ```
 
+<<<<<<< HEAD
 For more details on managing rails, see [Managing Rails](../guides/managing-rails.md).
 
 ## Integration with PDP
 
 The Payments system integrates with the [PDP (Provable Data Possession)](../../pdp/concepts/overview.md) system through the arbiter mechanism:
+=======
+## Integration with PDP
+
+The Payments system integrates with the PDP (Provable Data Possession) system through the arbiter mechanism:
+>>>>>>> update-payment-rate-docs
 
 1. A client creates a payment rail with an arbiter that monitors PDP compliance
 2. The PDP system records proof submissions and faults
 3. When settling payments, the arbiter checks PDP compliance records
 4. The arbiter adjusts payment amounts based on the storage provider's performance
 
+<<<<<<< HEAD
 For a detailed guide on integrating Payments with PDP, see [Integrating PDP with Payments](../../integration/pdp-payments.md).
 
 ## Deployed Contracts
@@ -181,6 +237,33 @@ The Payments contract is deployed on Filecoin Mainnet and Calibration Testnet.
 
 **Calibration Testnet**
 - [Payments Contract](https://calibration.filfox.info/en/address/0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A): `0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A`
+=======
+```solidity
+// Example of an arbiter that reduces payments based on PDP faults
+function arbitratePayment(
+    address token,
+    address from,
+    address to,
+    uint256 railId,
+    uint256 fromEpoch,
+    uint256 toEpoch,
+    uint256 amount
+) external view returns (ArbitrationResult memory) {
+    // Get fault count from PDP system
+    uint256 faultCount = pdpService.getFaultCount(proofSetId);
+    
+    // Calculate reduction based on faults
+    uint256 reduction = amount * faultCount * 10 / 100; // 10% per fault
+    
+    // Return adjusted amount
+    return ArbitrationResult({
+        modifiedAmount: amount - reduction,
+        settleUpto: toEpoch,
+        note: string(abi.encodePacked("Reduced by ", faultCount, " faults"))
+    });
+}
+```
+>>>>>>> update-payment-rate-docs
 
 ## Security Considerations
 
@@ -189,6 +272,7 @@ The Payments contract is deployed on Filecoin Mainnet and Calibration Testnet.
 3. **Arbitration Constraints**: Arbiters can only reduce payments, not increase them
 4. **Termination Safeguards**: Terminated rails still honor the lockup period
 
+<<<<<<< HEAD
 For more details on security considerations, see [Security Considerations](../../reference/security.md).
 
 ## Example Use Cases
@@ -211,11 +295,49 @@ Storage providers can integrate with the Payments system to:
 3. Manage multiple payment rails from different clients
 
 For more details, see [Storage Provider Integration](../../examples/storage-provider.md).
+=======
+## Advanced Features
+
+### Scheduled Rate Changes
+
+Payment rates can be scheduled to change at future epochs:
+
+```solidity
+// Schedule a rate change
+payments.scheduleRateChange(
+    railId,
+    block.number + 8640, // 3 days from now
+    1500000              // New rate (1.5 USDC per epoch)
+);
+```
+
+### Commission Payments
+
+The system supports commission payments to operators:
+
+```solidity
+// Create a rail with commission
+uint256 railId = payments.createRail(
+    usdcAddress,
+    clientAddress,
+    providerAddress,
+    arbiterAddress,
+    1000000,
+    2880,
+    5000000,
+    500         // 5% commission
+);
+```
+>>>>>>> update-payment-rate-docs
 
 ## Next Steps
 
 - [Setting Up Your First Payment Rail](../guides/first-rail.md)
 - [Implementing a Custom Arbiter](../guides/custom-arbiter.md)
+<<<<<<< HEAD
 - [Managing Funds](../guides/managing-funds.md)
 - [Payments API Reference](../api/payments-contract.md)
 - [Integrating PDP with Payments](../../integration/pdp-payments.md)
+=======
+- [Payments API Reference](../api/payments-contract.md)
+>>>>>>> update-payment-rate-docs
