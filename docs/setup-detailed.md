@@ -26,42 +26,65 @@ Filecoin provides JSON-RPC APIs for interacting with the blockchain. There are t
 
 ## 2. Available RPC Endpoints
 
+### Why Multiple Endpoints?
+
+Different RPC providers offer various features and reliability levels. We recommend **Glif** as the primary choice, with others as backups if you experience issues.
+
 ### Recommended Endpoints for Calibration Testnet
 
-**Glif (Recommended)**
+**Glif (Primary Choice)**
 - HTTPS: `https://api.calibration.node.glif.io/rpc/v1`
 - WebSocket: `wss://wss.calibration.node.glif.io/apigw/lotus/rpc/v1`
-- **Note**: Guarantees 2000 latest blocks
+- **Why recommended**: Guarantees 2000 latest blocks, most reliable for development
+- **Use this for**: All Golden Path steps
 
-**Ankr**
+**Ankr (Backup)**
 - HTTPS: `https://rpc.ankr.com/filecoin_testnet`
+- **Use if**: Glif is experiencing issues
 
-**ChainupCloud**
+**ChainupCloud (Backup)**
 - HTTPS: `https://filecoin-calibration.chainup.net/rpc/v1`
+- **Use if**: Both Glif and Ankr are unavailable
 
 ## 3. Set Up Your Development Environment
 
-### Clone the Documentation Repository
+### Create Your Project Directory
 
+For the Golden Path, you can start with a fresh project or use our examples:
+
+**Option A: Fresh Project (Recommended)**
+```bash
+mkdir my-pdp-app
+cd my-pdp-app
+npm init -y
+```
+
+**Option B: Clone Examples Repository**
 ```bash
 git clone https://github.com/timfong888/pdp-payment.git
 cd pdp-payment
 ```
+*Note: This repo contains documentation and examples, but you'll likely want your own project structure for production apps.*
 
 ### Install Node.js Dependencies
 
+**For Node.js scripts (like our connection test):**
 ```bash
 npm install viem dotenv
 ```
 
-This installs essential packages:
-- **viem**: Low-level Ethereum library for blockchain interactions
+**For React/Next.js apps (like Hot Vault demo):**
+```bash
+npm install wagmi @tanstack/react-query viem dotenv
+```
+
+**Library explanation:**
+- **viem**: Low-level Ethereum library - use this for Node.js scripts and backend
+- **wagmi**: React hooks for Ethereum - use this for frontend React/Next.js apps
+- **@tanstack/react-query**: Required by Wagmi for data fetching
 - **dotenv**: Environment variable management
 
-For React/Next.js apps, you'll also want:
-```bash
-npm install wagmi @tanstack/react-query
-```
+> **Our preference**: We use **viem** for backend/scripts and **wagmi** (which is built on viem) for React frontends. You can use whatever library you prefer, but this documentation focuses on the viem/wagmi ecosystem.
 
 ## 4. Configure Environment Variables
 
@@ -103,6 +126,8 @@ NETWORK_NAME=calibration
 4. Enter your password
 5. Copy the private key (remove the `0x` prefix)
 6. Paste into your `.env` file
+
+**📚 Official Guide**: [MetaMask: How to export an account's private key](https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key)
 
 **⚠️ Security Warning**: Never commit your `.env` file to version control!
 
@@ -230,46 +255,31 @@ node test-connection.js
 
 ## 6. Understanding JSON-RPC Methods
 
-### Common Ethereum-Compatible Methods
+### Golden Path Essential Methods
 
-These methods work with Filecoin's EVM-compatible layer using Viem/Wagmi:
+These are the key methods you'll use in the Golden Path:
 
 ```javascript
-// Get latest block number
+// Check connection and get block number
 await publicClient.getBlockNumber()
 
-// Get account balance
+// Check wallet balance
 await publicClient.getBalance({ address })
 
-// Get transaction receipt
-await publicClient.getTransactionReceipt({ hash: txHash })
-
-// Send transaction
-await walletClient.sendTransaction({
-  to: "0x...",
-  value: parseEther("1.0")
-})
-
-// Read contract method
+// Read contract data (like token balances)
 await publicClient.readContract({
   address: contractAddress,
   abi: contractAbi,
-  functionName: 'methodName',
-  args: [params]
+  functionName: 'balanceOf',
+  args: [userAddress]
 })
 ```
 
-### Filecoin-Specific Methods
+### For Complete Method Reference
 
-For native Filecoin operations (advanced usage):
-
-```javascript
-// Get chain head
-await provider.send("Filecoin.ChainHead", [])
-
-// Get actor state
-await provider.send("Filecoin.StateGetActor", [address, null])
-```
+- **Viem Documentation**: [viem.sh/docs/actions/public/introduction](https://viem.sh/docs/actions/public/introduction)
+- **Wagmi Documentation**: [wagmi.sh/react/api/hooks](https://wagmi.sh/react/api/hooks)
+- **Filecoin JSON-RPC**: [docs.filecoin.io/reference/json-rpc/](https://docs.filecoin.io/reference/json-rpc/)
 
 ## Troubleshooting
 

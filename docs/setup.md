@@ -41,9 +41,11 @@ This is the first step in your Golden Path to success with PDP-Payments. You'll 
 
 USDFC is the stablecoin used for payments in the PDP system. You'll mint USDFC by depositing tFIL as collateral.
 
+> **✅ Testnet Confirmation**: The USDFC protocol at [usdfc.secured.finance](https://usdfc.secured.finance/#/) **does support Filecoin Calibration testnet**. When you connect, make sure you're on the "Filecoin — Calibration Network" to mint testnet USDFC using your testnet tFIL.
+
 ### Access the USDFC Protocol
 1. Visit [usdfc.secured.finance](https://usdfc.secured.finance/#/)
-2. Ensure you're connected to "Filecoin — Calibration Network"
+2. **Important**: Ensure you're connected to "Filecoin — Calibration Network" (not mainnet)
 3. Click "Connect Wallet" and select MetaMask
 
 ### Mint USDFC Tokens

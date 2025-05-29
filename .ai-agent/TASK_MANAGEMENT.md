@@ -1,4 +1,6 @@
-# Task Management: PDP-Payments Documentation Project
+# AI Agent Task Management: PDP-Payments Documentation Project
+
+> **⚠️ Note**: This file is for AI agents working on documentation generation, not for developers using the system. Developers should start with the [README.md](../README.md).
 
 ## Overview
 This task management file tracks the autonomous technical documentation generation for the PDP-Payments (FWS) system. The goal is to create comprehensive documentation that serves both new developers and AI agents, with a focus on the "Golden Path" to hello world success.
