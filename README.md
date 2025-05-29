@@ -75,12 +75,24 @@ The integration between PDP and Payments enables:
 
 ## Getting Started
 
-To get started with PDP-Payments (FWS):
+### 🚀 Golden Path: Your First Success
 
-1. Review the [Quick Start Guide](docs/quick-start.md)
-2. Understand the [PDP System](docs/pdp-overview.md) and [Payments System](docs/payments/concepts/overview.md)
-3. Learn how to [Integrate PDP with Payments](docs/integration/pdp-payments.md)
-4. Explore the [Hot Vault Example](docs/examples/hot-vault.md)
+New to PDP-Payments? Follow our step-by-step Golden Path to get from zero to storing your first file with verifiable storage and automatic payments:
+
+1. **[Setup Wallet & USDFC](docs/setup.md)** - Configure MetaMask with Calibration testnet and get USDFC tokens
+2. **[Configure JSON-RPC](docs/setup-detailed.md)** - Set up Filecoin JSON-RPC for blockchain interactions
+3. **[Install Synapse SDK](docs/quick-start.md)** - Create a local app using the Synapse SDK
+4. **[Store Your First File](docs/first-deal.md)** - Upload a photo from your desktop to a storage provider
+5. **[Verify Storage Proof](docs/pdp-overview.md)** - Confirm your file is being stored with cryptographic proofs
+6. **[Retrieve Your File](docs/examples/hot-vault.md)** - Download your stored file back to your device
+
+### 📚 Deep Dive Documentation
+
+Once you've completed the Golden Path:
+
+1. Understand the [PDP System](docs/pdp-overview.md) and [Payments System](docs/payments-overview.md)
+2. Learn how to [Integrate PDP with Payments](docs/integration-guide.md)
+3. Explore advanced [Integration Patterns](docs/integration/pdp-payments.md)
 
 ## Contributing
 
