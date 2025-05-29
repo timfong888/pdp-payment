@@ -684,11 +684,11 @@ hotvault-demo/
 - **IPFS**: Decentralized file storage
 - **Filecoin Utils**: CAR file and CommP generation
 
-### Smart Contracts
-- **Solidity**: Contract development
-- **Hardhat**: Development environment
-- **OpenZeppelin**: Security-audited contract libraries
-- **Foundry**: Testing framework
+### Smart Contracts (Pre-deployed)
+- **PDP Verifier**: Deployed on Calibration testnet
+- **PDP Service**: Deployed on Calibration testnet
+- **Payments Contract**: Deployed on Calibration testnet
+- **USDFC Token**: Deployed stablecoin contract
 
 ## Troubleshooting
 

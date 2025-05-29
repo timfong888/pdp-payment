@@ -51,13 +51,17 @@ cd pdp-payment
 ### Install Node.js Dependencies
 
 ```bash
-npm install
+npm install viem dotenv
 ```
 
 This installs essential packages:
-- **ethers.js**: Ethereum/Filecoin blockchain interactions
+- **viem**: Low-level Ethereum library for blockchain interactions
 - **dotenv**: Environment variable management
-- **web3**: Alternative blockchain library
+
+For React/Next.js apps, you'll also want:
+```bash
+npm install wagmi @tanstack/react-query
+```
 
 ## 4. Configure Environment Variables
 
@@ -111,48 +115,89 @@ Create `test-connection.js`:
 ```javascript
 // test-connection.js
 require('dotenv').config();
-const { ethers } = require('ethers');
+const { createPublicClient, createWalletClient, http, formatEther, formatUnits } = require('viem');
+const { privateKeyToAccount } = require('viem/accounts');
+
+// Filecoin Calibration chain config
+const filecoinCalibration = {
+  id: 314159,
+  name: 'Filecoin Calibration',
+  network: 'filecoin-calibration',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'testnet FIL',
+    symbol: 'tFIL',
+  },
+  rpcUrls: {
+    default: {
+      http: [process.env.RPC_URL],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'FilFox', url: 'https://calibration.filfox.info' },
+  },
+};
 
 async function testConnection() {
   try {
-    // Create provider
-    const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+    // Create public client for reading
+    const publicClient = createPublicClient({
+      chain: filecoinCalibration,
+      transport: http(),
+    });
 
-    // Test basic connection
     console.log('🔗 Testing Filecoin JSON-RPC connection...');
-    const network = await provider.getNetwork();
-    console.log(`✅ Connected to network: ${network.name} (Chain ID: ${network.chainId})`);
 
     // Get current block
-    const blockNumber = await provider.getBlockNumber();
+    const blockNumber = await publicClient.getBlockNumber();
     console.log(`📦 Current block number: ${blockNumber}`);
+    console.log(`✅ Connected to network: ${filecoinCalibration.name} (Chain ID: ${filecoinCalibration.id})`);
 
-    // Test wallet connection
-    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-    console.log(`👛 Wallet address: ${wallet.address}`);
+    // Create wallet client
+    const account = privateKeyToAccount(`0x${process.env.PRIVATE_KEY}`);
+    console.log(`👛 Wallet address: ${account.address}`);
 
-    // Check balances
-    const filBalance = await provider.getBalance(wallet.address);
-    console.log(`💰 tFIL balance: ${ethers.formatEther(filBalance)} tFIL`);
+    // Check tFIL balance
+    const filBalance = await publicClient.getBalance({ address: account.address });
+    console.log(`💰 tFIL balance: ${formatEther(filBalance)} tFIL`);
 
     // Test USDFC token balance
-    const usdcAbi = [
-      "function balanceOf(address owner) view returns (uint256)",
-      "function symbol() view returns (string)",
-      "function decimals() view returns (uint8)"
-    ];
+    const usdcBalance = await publicClient.readContract({
+      address: process.env.USDFC_TOKEN_ADDRESS,
+      abi: [
+        {
+          name: 'balanceOf',
+          type: 'function',
+          stateMutability: 'view',
+          inputs: [{ name: 'owner', type: 'address' }],
+          outputs: [{ name: '', type: 'uint256' }],
+        },
+        {
+          name: 'symbol',
+          type: 'function',
+          stateMutability: 'view',
+          inputs: [],
+          outputs: [{ name: '', type: 'string' }],
+        },
+        {
+          name: 'decimals',
+          type: 'function',
+          stateMutability: 'view',
+          inputs: [],
+          outputs: [{ name: '', type: 'uint8' }],
+        },
+      ],
+      functionName: 'balanceOf',
+      args: [account.address],
+    });
 
-    const usdcContract = new ethers.Contract(
-      process.env.USDFC_TOKEN_ADDRESS,
-      usdcAbi,
-      provider
-    );
+    const usdcSymbol = await publicClient.readContract({
+      address: process.env.USDFC_TOKEN_ADDRESS,
+      abi: [{ name: 'symbol', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'string' }] }],
+      functionName: 'symbol',
+    });
 
-    const usdcBalance = await usdcContract.balanceOf(wallet.address);
-    const usdcDecimals = await usdcContract.decimals();
-    const usdcSymbol = await usdcContract.symbol();
-
-    console.log(`💵 ${usdcSymbol} balance: ${ethers.formatUnits(usdcBalance, usdcDecimals)} ${usdcSymbol}`);
+    console.log(`💵 ${usdcSymbol} balance: ${formatUnits(usdcBalance, 6)} ${usdcSymbol}`);
 
     console.log('\n🎉 JSON-RPC connection test successful!');
 
@@ -174,8 +219,8 @@ node test-connection.js
 **Expected Output:**
 ```
 🔗 Testing Filecoin JSON-RPC connection...
-✅ Connected to network: filecoin-calibration (Chain ID: 314159)
-📦 Current block number: 1234567
+📦 Current block number: 1234567n
+✅ Connected to network: Filecoin Calibration (Chain ID: 314159)
 👛 Wallet address: 0x1234...abcd
 💰 tFIL balance: 50.0 tFIL
 💵 USDFC balance: 30.0 USDFC
@@ -187,26 +232,31 @@ node test-connection.js
 
 ### Common Ethereum-Compatible Methods
 
-These methods work with Filecoin's EVM-compatible layer:
+These methods work with Filecoin's EVM-compatible layer using Viem/Wagmi:
 
 ```javascript
 // Get latest block number
-await provider.getBlockNumber()
+await publicClient.getBlockNumber()
 
 // Get account balance
-await provider.getBalance(address)
+await publicClient.getBalance({ address })
 
 // Get transaction receipt
-await provider.getTransactionReceipt(txHash)
+await publicClient.getTransactionReceipt({ hash: txHash })
 
 // Send transaction
-await wallet.sendTransaction({
+await walletClient.sendTransaction({
   to: "0x...",
-  value: ethers.parseEther("1.0")
+  value: parseEther("1.0")
 })
 
-// Call contract method
-await contract.methodName(params)
+// Read contract method
+await publicClient.readContract({
+  address: contractAddress,
+  abi: contractAbi,
+  functionName: 'methodName',
+  args: [params]
+})
 ```
 
 ### Filecoin-Specific Methods
@@ -247,5 +297,6 @@ await provider.send("Filecoin.StateGetActor", [address, null])
 ## Additional Resources
 
 - [Filecoin JSON-RPC Documentation](https://docs.filecoin.io/reference/json-rpc/)
-- [Ethers.js Documentation](https://docs.ethers.org/)
+- [Wagmi Documentation](https://wagmi.sh/)
+- [Viem Documentation](https://viem.sh/)
 - [Filecoin EVM Documentation](https://docs.filecoin.io/smart-contracts/fundamentals/)

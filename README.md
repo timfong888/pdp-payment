@@ -77,7 +77,10 @@ The integration between PDP and Payments enables:
 
 ### 🚀 Golden Path: Your First Success
 
-New to PDP-Payments? Follow our step-by-step Golden Path to get from zero to storing your first file with verifiable storage and automatic payments:
+**Are you building an app or developing contracts?**
+
+#### 📱 **App Developer Path** (Recommended for most users)
+Build apps using existing PDP-Payments contracts - no contract development needed:
 
 1. **[Setup Wallet & USDFC](docs/setup.md)** - Configure MetaMask with Calibration testnet and get USDFC tokens
 2. **[Configure JSON-RPC](docs/setup-detailed.md)** - Set up Filecoin JSON-RPC for blockchain interactions
@@ -85,6 +88,11 @@ New to PDP-Payments? Follow our step-by-step Golden Path to get from zero to sto
 4. **[Store Your First File](docs/first-deal.md)** - Upload a photo from your desktop to a storage provider
 5. **[Verify Storage Proof](docs/pdp-overview.md)** - Confirm your file is being stored with cryptographic proofs
 6. **[Retrieve Your File](docs/examples/hot-vault.md)** - Download your stored file back to your device
+
+#### ⚙️ **Contract Developer Path** (Advanced users)
+Deploy custom contracts or modify existing ones:
+- Follow the App Developer Path above, then
+- [Contract Development Guide](docs/contracts/development.md) - Hardhat/Foundry setup for custom contracts
 
 ### 📚 Deep Dive Documentation
 
