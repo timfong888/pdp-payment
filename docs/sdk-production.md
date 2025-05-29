@@ -308,135 +308,403 @@ class ProductionSynapse {
 export default ProductionSynapse
 ```
 
-## 3. Express.js API Example
+## 3. React + Next.js Integration
 
-```javascript
-// server.js
-import express from 'express'
-import multer from 'multer'
-import ProductionSynapse from './production-synapse.js'
+### Create Next.js App with PDP-Payments
 
-const app = express()
-const upload = multer({ storage: multer.memoryStorage() })
-let synapse
+```bash
+# Create Next.js app (recommended approach)
+npx create-next-app@latest my-pdp-app --typescript --tailwind --eslint --app
+cd my-pdp-app
 
-// Initialize Synapse
-async function initializeServer() {
-  synapse = await new ProductionSynapse().initialize()
-  
-  app.listen(3000, () => {
-    console.log('🚀 PDP-Payments API server running on port 3000')
-  })
+# Install Synapse SDK
+npm install synapse-sdk
+
+# Install additional dependencies for file handling
+npm install react-dropzone
+```
+
+### React Hook for Synapse SDK
+
+```typescript
+// hooks/useSynapse.ts
+import { useState, useEffect } from 'react'
+import { Synapse } from 'synapse-sdk'
+
+interface SynapseState {
+  synapse: Synapse | null
+  storage: any | null
+  balance: number
+  loading: boolean
+  error: string | null
 }
 
-// Health check endpoint
-app.get('/health', async (req, res) => {
-  try {
-    const health = await synapse.healthCheck()
-    res.json({ status: 'ok', ...health })
-  } catch (error) {
-    res.status(500).json({ status: 'error', message: error.message })
-  }
-})
+export function useSynapse(privateKey: string) {
+  const [state, setState] = useState<SynapseState>({
+    synapse: null,
+    storage: null,
+    balance: 0,
+    loading: true,
+    error: null
+  })
 
-// File upload endpoint
-app.post('/upload', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' })
+  useEffect(() => {
+    async function initializeSynapse() {
+      try {
+        const synapse = new Synapse({
+          privateKey,
+          withCDN: true,
+        })
+
+        const balance = await synapse.balance()
+        const storage = await synapse.createStorage()
+
+        setState({
+          synapse,
+          storage,
+          balance,
+          loading: false,
+          error: null
+        })
+      } catch (error) {
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        }))
+      }
     }
-    
-    const result = await synapse.storeFileWithRetry(req.file.buffer, {
-      maxRetries: 3,
-      retryDelay: 1000
-    })
-    
-    res.json({
-      success: true,
-      commp: result.commp.toString(),
-      storageProvider: result.storageProvider,
-      txHash: result.txHash,
-      filename: req.file.originalname,
-      size: req.file.size
-    })
-    
-  } catch (error) {
-    console.error('Upload error:', error.message)
-    res.status(500).json({ error: error.message })
-  }
-})
 
-// File download endpoint
-app.get('/download/:commp', async (req, res) => {
+    if (privateKey) {
+      initializeSynapse()
+    }
+  }, [privateKey])
+
+  return state
+}
+```
+
+### File Upload Component
+
+```typescript
+// components/FileUploader.tsx
+'use client'
+
+import { useState } from 'react'
+import { useDropzone } from 'react-dropzone'
+import { useSynapse } from '@/hooks/useSynapse'
+
+interface UploadedFile {
+  commp: string
+  filename: string
+  size: number
+  txHash: string
+  uploadTime: Date
+}
+
+export default function FileUploader() {
+  const [privateKey, setPrivateKey] = useState('')
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
+
+  const { synapse, storage, balance, loading, error } = useSynapse(privateKey)
+
+  const onDrop = async (acceptedFiles: File[]) => {
+    if (!storage) return
+
+    setUploading(true)
+
+    for (const file of acceptedFiles) {
+      try {
+        setUploadProgress(`Uploading ${file.name}...`)
+
+        // Convert file to Uint8Array
+        const arrayBuffer = await file.arrayBuffer()
+        const data = new Uint8Array(arrayBuffer)
+
+        // Upload with progress tracking
+        const uploadTask = storage.upload(data)
+
+        setUploadProgress(`Generating CommP for ${file.name}...`)
+        const commp = await uploadTask.commp()
+
+        setUploadProgress(`Storing ${file.name} with provider...`)
+        const sp = await uploadTask.store()
+
+        setUploadProgress(`Committing ${file.name} to blockchain...`)
+        const txHash = await uploadTask.done()
+
+        // Add to uploaded files list
+        const uploadedFile: UploadedFile = {
+          commp: commp.toString(),
+          filename: file.name,
+          size: file.size,
+          txHash,
+          uploadTime: new Date()
+        }
+
+        setUploadedFiles(prev => [...prev, uploadedFile])
+
+      } catch (error) {
+        console.error(`Upload failed for ${file.name}:`, error)
+        alert(`Upload failed for ${file.name}: ${error}`)
+      }
+    }
+
+    setUploading(false)
+    setUploadProgress('')
+  }
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    disabled: !storage || uploading
+  })
+
+  const downloadFile = async (commp: string, filename: string) => {
+    if (!storage) return
+
+    try {
+      const data = await storage.download(commp, {
+        noVerify: false,
+        withCDN: true
+      })
+
+      // Create download link
+      const blob = new Blob([data])
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+    } catch (error) {
+      console.error('Download failed:', error)
+      alert(`Download failed: ${error}`)
+    }
+  }
+
+  if (loading) {
+    return <div className="p-8">Loading Synapse SDK...</div>
+  }
+
+  if (error) {
+    return <div className="p-8 text-red-600">Error: {error}</div>
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-8">PDP-Payments File Storage</h1>
+
+      {/* Private Key Input */}
+      {!synapse && (
+        <div className="mb-8">
+          <label className="block text-sm font-medium mb-2">
+            Private Key (without 0x prefix):
+          </label>
+          <input
+            type="password"
+            value={privateKey}
+            onChange={(e) => setPrivateKey(e.target.value)}
+            className="w-full p-3 border rounded-lg"
+            placeholder="Enter your private key..."
+          />
+        </div>
+      )}
+
+      {synapse && (
+        <>
+          {/* Balance Display */}
+          <div className="mb-8 p-4 bg-blue-50 rounded-lg">
+            <h2 className="text-lg font-semibold">Account Status</h2>
+            <p>Balance: {balance} USDFC</p>
+            {balance < 10 && (
+              <p className="text-orange-600">⚠️ Low balance - consider depositing more USDFC</p>
+            )}
+          </div>
+
+          {/* File Upload Area */}
+          <div
+            {...getRootProps()}
+            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+              isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+            } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <input {...getInputProps()} />
+            {uploading ? (
+              <div>
+                <p className="text-lg">Uploading...</p>
+                <p className="text-sm text-gray-600">{uploadProgress}</p>
+              </div>
+            ) : isDragActive ? (
+              <p className="text-lg">Drop files here...</p>
+            ) : (
+              <div>
+                <p className="text-lg">Drag & drop files here, or click to select</p>
+                <p className="text-sm text-gray-600">Files will be stored with PDP verification and automatic payments</p>
+              </div>
+            )}
+          </div>
+
+          {/* Uploaded Files List */}
+          {uploadedFiles.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Uploaded Files</h2>
+              <div className="space-y-4">
+                {uploadedFiles.map((file, index) => (
+                  <div key={index} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">{file.filename}</h3>
+                        <p className="text-sm text-gray-600">Size: {file.size} bytes</p>
+                        <p className="text-sm text-gray-600">
+                          CommP: {file.commp.substring(0, 20)}...
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Uploaded: {file.uploadTime.toLocaleString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => downloadFile(file.commp, file.filename)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      >
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+```
+
+## 4. Vercel Deployment (Recommended)
+
+### Main App Page
+
+```typescript
+// app/page.tsx
+import FileUploader from '@/components/FileUploader'
+
+export default function Home() {
+  return (
+    <main className="min-h-screen bg-gray-50">
+      <FileUploader />
+    </main>
+  )
+}
+```
+
+### Environment Variables Setup
+
+```bash
+# .env.local (for development)
+NEXT_PUBLIC_PRIVATE_KEY=your_private_key_here
+
+# For production, set in Vercel dashboard:
+# Settings > Environment Variables
+```
+
+### Optional: API Route for Server-Side Operations
+
+```typescript
+// app/api/balance/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { Synapse } from 'synapse-sdk'
+
+export async function GET(request: NextRequest) {
   try {
-    const data = await synapse.storage.download(req.params.commp, {
-      noVerify: false,
-      withCDN: true
-    })
-    
-    res.set({
-      'Content-Type': 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="${req.params.commp}"`
-    })
-    
-    res.send(Buffer.from(data))
-    
+    const privateKey = process.env.PRIVATE_KEY
+    if (!privateKey) {
+      return NextResponse.json({ error: 'Private key not configured' }, { status: 500 })
+    }
+
+    const synapse = new Synapse({ privateKey, withCDN: true })
+    const balance = await synapse.balance()
+
+    return NextResponse.json({ balance })
   } catch (error) {
-    console.error('Download error:', error.message)
-    res.status(404).json({ error: 'File not found or retrieval failed' })
+    return NextResponse.json(
+      { error: 'Failed to fetch balance' },
+      { status: 500 }
+    )
   }
-})
-
-// Start server
-initializeServer().catch(console.error)
+}
 ```
 
-## 4. Docker Deployment
+### Deploy to Vercel
 
-```dockerfile
-# Dockerfile
-FROM node:18-alpine
+```bash
+# Install Vercel CLI
+npm i -g vercel
 
-WORKDIR /app
+# Deploy (first time)
+vercel
 
-# Copy package files
-COPY package*.json ./
-RUN npm ci --only=production
+# Follow prompts:
+# - Link to existing project? No
+# - Project name: my-pdp-app
+# - Directory: ./
+# - Override settings? No
 
-# Copy application code
-COPY . .
+# Set environment variables
+vercel env add PRIVATE_KEY
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-USER nextjs
-
-EXPOSE 3000
-
-CMD ["node", "server.js"]
+# Deploy to production
+vercel --prod
 ```
 
-```yaml
-# docker-compose.yml
-version: '3.8'
+### Vercel Configuration
 
-services:
-  pdp-payments-api:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    env_file:
-      - .env.production
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    volumes:
-      - ./logs:/app/logs
+```json
+// vercel.json (optional)
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "env": {
+    "NEXT_PUBLIC_APP_NAME": "PDP-Payments Storage"
+  }
+}
+```
+
+### Automatic Deployments
+
+```bash
+# Connect to GitHub for automatic deployments
+vercel --prod
+
+# Every push to main branch will auto-deploy
+# Pull requests get preview deployments
+```
+
+### Quick Deployment Summary
+
+```bash
+# 🚀 Deploy PDP-Payments app in 2 minutes:
+
+# 1. Create Next.js app
+npx create-next-app@latest my-pdp-app --typescript --tailwind --app
+cd my-pdp-app
+
+# 2. Install dependencies
+npm install synapse-sdk react-dropzone
+
+# 3. Add components (copy from examples above)
+# 4. Set environment variables
+# 5. Deploy to Vercel
+vercel --prod
+
+# ✅ Your PDP-Payments app is live!
 ```
 
 ## 5. Monitoring & Observability
@@ -502,28 +770,35 @@ metrics.gauge('balance.current', balance)
 ## 6. Best Practices Summary
 
 ### 🔒 **Security**
-- ✅ Never hardcode private keys
-- ✅ Use environment variables for configuration
-- ✅ Implement proper error handling
-- ✅ Monitor for suspicious activity
+- ✅ Never hardcode private keys in client code
+- ✅ Use Vercel environment variables for sensitive data
+- ✅ Implement proper error handling in React components
+- ✅ Consider server-side operations for sensitive actions
 
 ### 📈 **Performance**
-- ✅ Implement rate limiting
-- ✅ Use connection pooling
-- ✅ Add retry logic with exponential backoff
-- ✅ Monitor and optimize costs
+- ✅ Use React hooks for state management
+- ✅ Implement loading states and progress indicators
+- ✅ Add retry logic with user feedback
+- ✅ Optimize bundle size with Next.js
 
 ### 🔧 **Reliability**
-- ✅ Health checks and monitoring
-- ✅ Graceful error handling
-- ✅ Automatic balance management
-- ✅ Redundancy and failover
+- ✅ Graceful error handling with user-friendly messages
+- ✅ Automatic balance monitoring in UI
+- ✅ File upload progress tracking
+- ✅ Vercel's built-in reliability and CDN
 
 ### 💰 **Cost Management**
-- ✅ Monitor USDFC spending
-- ✅ Optimize storage provider selection
-- ✅ Implement usage quotas
-- ✅ Track ROI and efficiency
+- ✅ Display balance warnings to users
+- ✅ Track upload costs in UI
+- ✅ Implement usage quotas per user
+- ✅ Monitor Vercel usage and costs
+
+### 🚀 **Modern Development**
+- ✅ TypeScript for type safety
+- ✅ Tailwind CSS for rapid styling
+- ✅ React hooks for clean state management
+- ✅ Next.js App Router for modern patterns
+- ✅ Vercel for zero-config deployment
 
 ## 🎉 Congratulations!
 
