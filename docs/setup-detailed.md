@@ -1,236 +1,312 @@
-# Setting Up Your Environment for PDP-Payments (FWS)
+# Step 2: Configure JSON-RPC for Filecoin
 
-This guide will walk you through setting up your development environment for working with the PDP-Payments (FWS) system, including both the Provable Data Possession (PDP) and Payments components.
+This is the second step in your Golden Path. You'll set up Filecoin JSON-RPC connections to interact with the blockchain and prepare your development environment.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+- ✅ Completed [Step 1: Setup Wallet & USDFC](setup.md)
+- **Node.js** (v18 or later) installed
+- **npm** (v9 or later) installed
+- **Git** installed
+- **Code editor** (VS Code recommended)
 
-- [Node.js](https://nodejs.org/) (v16 or later)
-- [npm](https://www.npmjs.com/) (v7 or later)
-- [Git](https://git-scm.com/)
-- [MetaMask](https://metamask.io/) or another Ethereum wallet
-- Basic knowledge of Ethereum and smart contracts
+## 1. Understanding Filecoin JSON-RPC
 
-## Step 1: Set Up Your Blockchain Environment
+Filecoin provides JSON-RPC APIs for interacting with the blockchain. There are two main types:
 
-### Connect to Filecoin Calibration Testnet
+### Filecoin JSON-RPC API
+- **Purpose**: Native Filecoin operations (storage deals, mining, etc.)
+- **Endpoint**: `https://api.calibration.node.glif.io/rpc/v1`
+- **Use cases**: Storage provider interactions, deal making
 
-For development and testing, we recommend using the Filecoin Calibration Testnet:
+### Ethereum-compatible JSON-RPC API
+- **Purpose**: Smart contract interactions (what we'll use for PDP-Payments)
+- **Endpoint**: `https://api.calibration.node.glif.io/rpc/v1` (same endpoint, different methods)
+- **Use cases**: Contract deployment, token transfers, PDP operations
 
-1. Open MetaMask and add the Filecoin Calibration Testnet:
-   - Network Name: `Filecoin Calibration Testnet`
-   - RPC URL: `https://calibration.filfox.info/rpc/v1`
-   - Chain ID: `314159`
-   - Currency Symbol: `tFIL`
-   - Block Explorer URL: `https://calibration.filfox.info/`
+## 2. Available RPC Endpoints
 
-2. Get some test tokens:
-   - Visit the [Filecoin Faucet](https://faucet.calibration.fildev.network/)
-   - Enter your wallet address
-   - Receive test tFIL
+### Why Multiple Endpoints?
 
-### Get Test USDC Tokens
+Different RPC providers offer various features and reliability levels. We recommend **Glif** as the primary choice, with others as backups if you experience issues.
 
-For payment functionality, you'll need test USDC tokens:
+### Recommended Endpoints for Calibration Testnet
 
-1. Visit a testnet USDC faucet (specific to Filecoin Calibration)
-2. Request test USDC tokens to your wallet address
-3. Verify the tokens appear in your wallet
+**Glif (Primary Choice)**
+- HTTPS: `https://api.calibration.node.glif.io/rpc/v1`
+- WebSocket: `wss://wss.calibration.node.glif.io/apigw/lotus/rpc/v1`
+- **Why recommended**: Guarantees 2000 latest blocks, most reliable for development
+- **Use this for**: All Golden Path steps
 
-## Step 2: Clone the Repository
+**Ankr (Backup)**
+- HTTPS: `https://rpc.ankr.com/filecoin_testnet`
+- **Use if**: Glif is experiencing issues
 
-Clone the PDP-Payments (FWS) repository to your local machine:
+**ChainupCloud (Backup)**
+- HTTPS: `https://filecoin-calibration.chainup.net/rpc/v1`
+- **Use if**: Both Glif and Ankr are unavailable
 
+## 3. Set Up Your Development Environment
+
+### Create Your Project Directory
+
+For the Golden Path, you can start with a fresh project or use our examples:
+
+**Option A: Fresh Project (Recommended)**
+```bash
+mkdir my-pdp-app
+cd my-pdp-app
+npm init -y
+```
+
+**Option B: Clone Examples Repository**
 ```bash
 git clone https://github.com/timfong888/pdp-payment.git
 cd pdp-payment
 ```
+*Note: This repo contains documentation and examples, but you'll likely want your own project structure for production apps.*
 
-## Step 3: Install Dependencies
+### Install Node.js Dependencies
 
-Install the required dependencies:
-
+**For Node.js scripts (like our connection test):**
 ```bash
-npm install
+npm install viem dotenv
 ```
 
-This will install all the necessary packages, including:
-- ethers.js for blockchain interactions
-- dotenv for environment variable management
-- Other dependencies required by the project
+**For React/Next.js apps (like Hot Vault demo):**
+```bash
+npm install wagmi @tanstack/react-query viem dotenv
+```
 
-## Step 4: Configure Environment Variables
+**Library explanation:**
+- **viem**: Low-level Ethereum library - use this for Node.js scripts and backend
+- **wagmi**: React hooks for Ethereum - use this for frontend React/Next.js apps
+- **@tanstack/react-query**: Required by Wagmi for data fetching
+- **dotenv**: Environment variable management
 
-Create a `.env` file in the root directory of the project:
+> **Our preference**: We use **viem** for backend/scripts and **wagmi** (which is built on viem) for React frontends. You can use whatever library you prefer, but this documentation focuses on the viem/wagmi ecosystem.
+
+## 4. Configure Environment Variables
+
+### Create Environment File
 
 ```bash
 touch .env
 ```
 
-Add the following environment variables to the `.env` file:
+### Add Configuration
 
-```
-# Private key (without 0x prefix)
-PRIVATE_KEY=your_private_key_here
+Add the following to your `.env` file:
 
-# Contract addresses
+```bash
+# Wallet Configuration
+PRIVATE_KEY=your_private_key_here_without_0x_prefix
+
+# Filecoin Calibration Testnet RPC
+RPC_URL=https://api.calibration.node.glif.io/rpc/v1
+
+# Contract Addresses (Calibration Testnet)
 PDP_VERIFIER_ADDRESS=0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC
 PDP_SERVICE_ADDRESS=0x6170dE2b09b404776197485F3dc6c968Ef948505
 PAYMENTS_ADDRESS=0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A
 
-# RPC URL
-RPC_URL=https://calibration.filfox.info/rpc/v1
+# Token Addresses
+USDFC_TOKEN_ADDRESS=0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0
 
-# Token address (USDC on Calibration)
-TOKEN_ADDRESS=0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0
+# Network Configuration
+CHAIN_ID=314159
+NETWORK_NAME=calibration
 ```
 
-**Important**: Never commit your `.env` file to version control. Make sure it's included in your `.gitignore` file.
+### Get Your Private Key
 
-## Step 5: Set Up Contract ABIs
+1. Open MetaMask
+2. Click the three dots menu → Account details
+3. Click "Export Private Key"
+4. Enter your password
+5. Copy the private key (remove the `0x` prefix)
+6. Paste into your `.env` file
 
-Create a directory for ABIs and download the necessary ABI files:
+**📚 Official Guide**: [MetaMask: How to export an account's private key](https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key)
 
-```bash
-mkdir -p abis
-```
+**⚠️ Security Warning**: Never commit your `.env` file to version control!
 
-You'll need the following ABI files:
-- PDPVerifier.json
-- SimplePDPService.json
-- Payments.json
+## 5. Test Your JSON-RPC Connection
 
-These can be obtained from the contract repositories or compiled from the contract source code.
+### Create a Connection Test Script
 
-## Step 6: Verify Your Setup
-
-Create a simple script to verify your setup:
+Create `test-connection.js`:
 
 ```javascript
-// verify-setup.js
+// test-connection.js
 require('dotenv').config();
-const ethers = require('ethers');
+const { createPublicClient, createWalletClient, http, formatEther, formatUnits } = require('viem');
+const { privateKeyToAccount } = require('viem/accounts');
 
-// Contract ABIs
-const pdpVerifierAbi = require('./abis/PDPVerifier.json');
-const pdpServiceAbi = require('./abis/SimplePDPService.json');
-const paymentsAbi = require('./abis/Payments.json');
+// Filecoin Calibration chain config
+const filecoinCalibration = {
+  id: 314159,
+  name: 'Filecoin Calibration',
+  network: 'filecoin-calibration',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'testnet FIL',
+    symbol: 'tFIL',
+  },
+  rpcUrls: {
+    default: {
+      http: [process.env.RPC_URL],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'FilFox', url: 'https://calibration.filfox.info' },
+  },
+};
 
-// Environment variables
-const privateKey = process.env.PRIVATE_KEY;
-const pdpVerifierAddress = process.env.PDP_VERIFIER_ADDRESS;
-const pdpServiceAddress = process.env.PDP_SERVICE_ADDRESS;
-const paymentsAddress = process.env.PAYMENTS_ADDRESS;
-const rpcUrl = process.env.RPC_URL;
+async function testConnection() {
+  try {
+    // Create public client for reading
+    const publicClient = createPublicClient({
+      chain: filecoinCalibration,
+      transport: http(),
+    });
 
-// Provider and signer
-const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-const wallet = new ethers.Wallet(privateKey, provider);
+    console.log('🔗 Testing Filecoin JSON-RPC connection...');
 
-// Contract instances
-const pdpVerifier = new ethers.Contract(pdpVerifierAddress, pdpVerifierAbi, wallet);
-const pdpService = new ethers.Contract(pdpServiceAddress, pdpServiceAbi, wallet);
-const payments = new ethers.Contract(paymentsAddress, paymentsAbi, wallet);
+    // Get current block
+    const blockNumber = await publicClient.getBlockNumber();
+    console.log(`📦 Current block number: ${blockNumber}`);
+    console.log(`✅ Connected to network: ${filecoinCalibration.name} (Chain ID: ${filecoinCalibration.id})`);
 
-async function main() {
-  console.log('Connected to Filecoin Calibration Testnet');
-  
-  // Get the current block number
-  const blockNumber = await provider.getBlockNumber();
-  console.log(`Current block number: ${blockNumber}`);
-  
-  // Get the next proof set ID
-  const nextProofSetId = await pdpVerifier.getNextProofSetId();
-  console.log(`Next proof set ID: ${nextProofSetId}`);
-  
-  // Get the maximum proving period
-  const maxProvingPeriod = await pdpService.getMaxProvingPeriod();
-  console.log(`Maximum proving period: ${maxProvingPeriod} epochs`);
-  
-  // Get wallet balance
-  const balance = await provider.getBalance(wallet.address);
-  console.log(`Wallet balance: ${ethers.utils.formatEther(balance)} tFIL`);
-  
-  console.log('Setup verification complete!');
+    // Create wallet client
+    const account = privateKeyToAccount(`0x${process.env.PRIVATE_KEY}`);
+    console.log(`👛 Wallet address: ${account.address}`);
+
+    // Check tFIL balance
+    const filBalance = await publicClient.getBalance({ address: account.address });
+    console.log(`💰 tFIL balance: ${formatEther(filBalance)} tFIL`);
+
+    // Test USDFC token balance
+    const usdcBalance = await publicClient.readContract({
+      address: process.env.USDFC_TOKEN_ADDRESS,
+      abi: [
+        {
+          name: 'balanceOf',
+          type: 'function',
+          stateMutability: 'view',
+          inputs: [{ name: 'owner', type: 'address' }],
+          outputs: [{ name: '', type: 'uint256' }],
+        },
+        {
+          name: 'symbol',
+          type: 'function',
+          stateMutability: 'view',
+          inputs: [],
+          outputs: [{ name: '', type: 'string' }],
+        },
+        {
+          name: 'decimals',
+          type: 'function',
+          stateMutability: 'view',
+          inputs: [],
+          outputs: [{ name: '', type: 'uint8' }],
+        },
+      ],
+      functionName: 'balanceOf',
+      args: [account.address],
+    });
+
+    const usdcSymbol = await publicClient.readContract({
+      address: process.env.USDFC_TOKEN_ADDRESS,
+      abi: [{ name: 'symbol', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'string' }] }],
+      functionName: 'symbol',
+    });
+
+    console.log(`💵 ${usdcSymbol} balance: ${formatUnits(usdcBalance, 6)} ${usdcSymbol}`);
+
+    console.log('\n🎉 JSON-RPC connection test successful!');
+
+  } catch (error) {
+    console.error('❌ Connection test failed:', error.message);
+    process.exit(1);
+  }
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error);
-    process.exit(1);
-  });
+testConnection();
 ```
 
-Run the verification script:
+### Run the Test
 
 ```bash
-node verify-setup.js
+node test-connection.js
 ```
 
-If everything is set up correctly, you should see output similar to:
-
+**Expected Output:**
 ```
-Connected to Filecoin Calibration Testnet
-Current block number: 1234567
-Next proof set ID: 42
-Maximum proving period: 60 epochs
-Wallet balance: 1.5 tFIL
-Setup verification complete!
-```
+🔗 Testing Filecoin JSON-RPC connection...
+📦 Current block number: 1234567n
+✅ Connected to network: Filecoin Calibration (Chain ID: 314159)
+👛 Wallet address: 0x1234...abcd
+💰 tFIL balance: 50.0 tFIL
+💵 USDFC balance: 30.0 USDFC
 
-## Step 7: Set Up Development Tools
-
-For a better development experience, we recommend setting up the following tools:
-
-### Hardhat (for contract development and testing)
-
-```bash
-npm install --save-dev hardhat
-npx hardhat init
+🎉 JSON-RPC connection test successful!
 ```
 
-### Solidity Extension for VS Code
+## 6. Understanding JSON-RPC Methods
 
-If you're using Visual Studio Code, install the Solidity extension:
-- Open VS Code
-- Go to Extensions (Ctrl+Shift+X)
-- Search for "Solidity" and install the extension by Juan Blanco
+### Golden Path Essential Methods
 
-## Step 8: Explore the Documentation
+These are the key methods you'll use in the Golden Path:
 
-Now that your environment is set up, explore the rest of the documentation to learn how to use the PDP-Payments (FWS) system:
+```javascript
+// Check connection and get block number
+await publicClient.getBlockNumber()
 
-- [PDP Overview](pdp-overview.md): Understand the Provable Data Possession system
-- [Payments Overview](payments-overview.md): Learn about the Payments system
-- [Integration Guide](integration-guide.md): See how to integrate PDP with Payments
-- [Quick Start](quick-start.md): Follow a quick start guide to build your first application
-- [Hot Vault Example](examples/hot-vault.md): Explore a complete example implementation
+// Check wallet balance
+await publicClient.getBalance({ address })
+
+// Read contract data (like token balances)
+await publicClient.readContract({
+  address: contractAddress,
+  abi: contractAbi,
+  functionName: 'balanceOf',
+  args: [userAddress]
+})
+```
+
+### For Complete Method Reference
+
+- **Viem Documentation**: [viem.sh/docs/actions/public/introduction](https://viem.sh/docs/actions/public/introduction)
+- **Wagmi Documentation**: [wagmi.sh/react/api/hooks](https://wagmi.sh/react/api/hooks)
+- **Filecoin JSON-RPC**: [docs.filecoin.io/reference/json-rpc/](https://docs.filecoin.io/reference/json-rpc/)
 
 ## Troubleshooting
 
 ### Connection Issues
+- **RPC timeout**: Try a different endpoint (Ankr or ChainupCloud)
+- **Network mismatch**: Ensure Chain ID is 314159
+- **Rate limiting**: Use your own RPC node for heavy usage
 
-If you're having trouble connecting to the Filecoin Calibration Testnet:
-- Verify your RPC URL is correct
-- Check if the network is experiencing any issues
-- Try using a different RPC endpoint
+### Authentication Errors
+- **Invalid private key**: Ensure no `0x` prefix in `.env`
+- **Wrong network**: Verify you're on Calibration testnet
+- **Insufficient gas**: Ensure you have tFIL for transactions
 
-### Contract Interaction Errors
-
-If you encounter errors when interacting with contracts:
-- Ensure you have the correct contract addresses
-- Verify your ABI files match the deployed contracts
-- Check if you have sufficient tFIL for gas fees
-
-### Token Issues
-
-If you're having trouble with tokens:
-- Verify you have the correct token address
-- Ensure you have sufficient token balance
-- Check if you've approved the Payments contract to spend your tokens
+### Contract Interaction Issues
+- **Contract not found**: Verify contract addresses are correct
+- **Method not found**: Check ABI matches deployed contract
+- **Transaction reverted**: Check contract state and parameters
 
 ## Next Steps
 
-After setting up your environment, proceed to the [Quick Start Guide](quick-start.md) to begin building with the PDP-Payments (FWS) system.
+🎉 **Congratulations!** You've completed Step 2 of the Golden Path.
+
+**Next**: [Step 3: Install Synapse SDK](quick-start.md) - Create a local app using the Synapse SDK
+
+## Additional Resources
+
+- [Filecoin JSON-RPC Documentation](https://docs.filecoin.io/reference/json-rpc/)
+- [Wagmi Documentation](https://wagmi.sh/)
+- [Viem Documentation](https://viem.sh/)
+- [Filecoin EVM Documentation](https://docs.filecoin.io/smart-contracts/fundamentals/)

@@ -1,301 +1,351 @@
-# Quick Start Guide
+# Step 3: Install Synapse SDK
 
-This guide will help you get started with the FilOz ecosystem, including both the Provable Data Possession (PDP) and Payments systems.
+This is the third step in your Golden Path. You'll create a local application using the Synapse SDK to interact with Filecoin storage providers and the PDP-Payments system.
 
 ## Prerequisites
 
-Before you begin, ensure you have:
+- ✅ Completed [Step 1: Setup Wallet & USDFC](setup.md)
+- ✅ Completed [Step 2: Configure JSON-RPC](setup-detailed.md)
+- **Node.js** (v18 or later) installed
+- **npm** (v9 or later) installed
 
-- [Node.js](https://nodejs.org/) (v16 or later)
-- [npm](https://www.npmjs.com/) (v7 or later)
-- [MetaMask](https://metamask.io/) or another Ethereum wallet
-- Basic knowledge of Ethereum and smart contracts
-- Some test tokens on Filecoin Calibration Testnet
+## 1. Understanding the Synapse SDK
 
-## Step 1: Connect to Filecoin Calibration Testnet
+The Synapse SDK provides a simple JavaScript/TypeScript interface for:
+- **Binary Storage**: Store and retrieve files up to specified size limits
+- **PDP Verification**: Cryptographic proofs ensure your data remains available
+- **Payment Management**: Deposit, withdraw, and settle payments in USDFC
+- **Optional CDN**: Pay extra for CDN-accelerated retrievals
 
-1. Open MetaMask and add the Filecoin Calibration Testnet:
-   - Network Name: `Filecoin Calibration Testnet`
-   - RPC URL: `https://calibration.filfox.info/rpc/v1`
-   - Chain ID: `314159`
-   - Currency Symbol: `tFIL`
-   - Block Explorer URL: `https://calibration.filfox.info/`
+### Key Features
+- Simple API for file upload/download
+- Automatic payment handling
+- Progress tracking for uploads
+- Built-in proof verification
 
-2. Get some test tokens:
-   - Visit the [Filecoin Faucet](https://faucet.calibration.fildev.network/)
-   - Enter your wallet address
-   - Receive test tFIL
+## 2. Create Your Local App
 
-## Step 2: Set Up Your Development Environment
-
-Create a new project and install the required dependencies:
+### Initialize a New Project
 
 ```bash
-# Create a new directory
-mkdir filoz-quickstart
-cd filoz-quickstart
+# Create a new directory for your app
+mkdir my-storage-app
+cd my-storage-app
 
-# Initialize a new npm project
+# Initialize npm project
 npm init -y
 
-# Install dependencies
-npm install ethers@5.7.2 dotenv
+# Install the Synapse SDK (currently using mock implementation)
+npm install synapse-sdk
+
+# Install additional dependencies
+npm install dotenv fs-extra
 ```
 
-Create a `.env` file to store your private keys and contract addresses:
+### Project Structure
 
+Your project should look like this:
 ```
-# .env
-PRIVATE_KEY=your_private_key_here
-PDP_VERIFIER_ADDRESS=0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC
-PDP_SERVICE_ADDRESS=0x6170dE2b09b404776197485F3dc6c968Ef948505
-PAYMENTS_ADDRESS=0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A
+my-storage-app/
+├── package.json
+├── .env
+├── index.js
+├── upload-file.js
+└── files/
+    └── (your test files)
 ```
 
-## Step 3: Create a Basic Script
+## 3. Configure Your Environment
 
-Create a file named `index.js` with the following content:
+### Create Environment File
+
+```bash
+touch .env
+```
+
+### Add Configuration
+
+```bash
+# Wallet Configuration (from Step 2)
+PRIVATE_KEY=your_private_key_here_without_0x_prefix
+
+# Synapse SDK Configuration
+SYNAPSE_PRIVATE_KEY=your_private_key_here_without_0x_prefix
+SYNAPSE_WITH_CDN=true
+SYNAPSE_RPC_API=https://api.calibration.node.glif.io/rpc/v1
+SYNAPSE_SERVICE_CONTRACT=0x6170dE2b09b404776197485F3dc6c968Ef948505
+```
+
+## 4. Create Your First Synapse App
+
+### Basic Setup Script
+
+Create `index.js`:
 
 ```javascript
+// index.js
 require('dotenv').config();
-const ethers = require('ethers');
-
-// Contract ABIs
-const pdpVerifierAbi = require('./abis/PDPVerifier.json');
-const pdpServiceAbi = require('./abis/SimplePDPService.json');
-const paymentsAbi = require('./abis/Payments.json');
-
-// Environment variables
-const privateKey = process.env.PRIVATE_KEY;
-const pdpVerifierAddress = process.env.PDP_VERIFIER_ADDRESS;
-const pdpServiceAddress = process.env.PDP_SERVICE_ADDRESS;
-const paymentsAddress = process.env.PAYMENTS_ADDRESS;
-
-// Provider and signer
-const provider = new ethers.providers.JsonRpcProvider('https://calibration.filfox.info/rpc/v1');
-const wallet = new ethers.Wallet(privateKey, provider);
-
-// Contract instances
-const pdpVerifier = new ethers.Contract(pdpVerifierAddress, pdpVerifierAbi, wallet);
-const pdpService = new ethers.Contract(pdpServiceAddress, pdpServiceAbi, wallet);
-const payments = new ethers.Contract(paymentsAddress, paymentsAbi, wallet);
+const { Synapse } = require('synapse-sdk');
+const fs = require('fs-extra');
+const path = require('path');
 
 async function main() {
-  console.log('Connected to Filecoin Calibration Testnet');
-  
-  // Get the current block number
-  const blockNumber = await provider.getBlockNumber();
-  console.log(`Current block number: ${blockNumber}`);
-  
-  // Get the next proof set ID
-  const nextProofSetId = await pdpVerifier.getNextProofSetId();
-  console.log(`Next proof set ID: ${nextProofSetId}`);
-  
-  // Get the maximum proving period
-  const maxProvingPeriod = await pdpService.getMaxProvingPeriod();
-  console.log(`Maximum proving period: ${maxProvingPeriod} epochs`);
+  console.log('🚀 Starting Synapse SDK Demo...');
+
+  // Initialize Synapse
+  const synapse = new Synapse({
+    privateKey: process.env.SYNAPSE_PRIVATE_KEY,
+    withCDN: process.env.SYNAPSE_WITH_CDN === 'true',
+    rpcAPI: process.env.SYNAPSE_RPC_API,
+    serviceContract: process.env.SYNAPSE_SERVICE_CONTRACT
+  });
+
+  console.log('✅ Synapse SDK initialized');
+
+  // Check and manage balance
+  console.log('💰 Checking balance...');
+  let balance = await synapse.balance();
+  console.log(`Current balance: ${balance} USDFC`);
+
+  if (balance < 50) {
+    console.log('💳 Depositing funds...');
+    await synapse.deposit(50 - balance);
+    balance = await synapse.balance();
+    console.log(`New balance: ${balance} USDFC`);
+  }
+
+  // Create a storage service instance
+  console.log('🗄️ Creating storage service...');
+  const storage = await synapse.createStorage();
+  console.log('✅ Storage service created');
+
+  console.log('\n🎉 Setup complete! Ready to store files.');
+  console.log('\nNext steps:');
+  console.log('1. Run: node upload-file.js');
+  console.log('2. Follow the prompts to upload a file');
 }
 
 main()
   .then(() => process.exit(0))
   .catch(error => {
-    console.error(error);
+    console.error('❌ Error:', error.message);
     process.exit(1);
   });
 ```
 
-Create a directory for ABIs and download the necessary ABI files:
+## 5. Create File Upload Script
 
-```bash
-mkdir abis
-# Download ABIs from the FilOz repositories
-# You can find these in the artifacts directories of the respective repositories
+### File Upload Implementation
+
+Create `upload-file.js`:
+
+```javascript
+// upload-file.js
+require('dotenv').config();
+const { Synapse } = require('synapse-sdk');
+const fs = require('fs-extra');
+const path = require('path');
+
+async function uploadFile() {
+  try {
+    console.log('📁 File Upload Demo');
+
+    // Initialize Synapse
+    const synapse = new Synapse({
+      privateKey: process.env.SYNAPSE_PRIVATE_KEY,
+      withCDN: process.env.SYNAPSE_WITH_CDN === 'true'
+    });
+
+    // Create storage service
+    const storage = await synapse.createStorage();
+
+    // Create test file if it doesn't exist
+    const filesDir = path.join(__dirname, 'files');
+    await fs.ensureDir(filesDir);
+
+    const testFilePath = path.join(filesDir, 'test-image.txt');
+    if (!await fs.pathExists(testFilePath)) {
+      const testContent = `Hello from Synapse SDK!
+This is a test file uploaded on ${new Date().toISOString()}
+File size: ${Math.random() * 1000} bytes
+Random data: ${Math.random().toString(36).substring(7)}`;
+
+      await fs.writeFile(testFilePath, testContent);
+      console.log(`📝 Created test file: ${testFilePath}`);
+    }
+
+    // Read file as binary data
+    const fileBuffer = await fs.readFile(testFilePath);
+    const data = new Uint8Array(fileBuffer);
+
+    console.log(`📤 Uploading file: ${path.basename(testFilePath)} (${data.length} bytes)`);
+
+    // Upload binary data
+    const uploadTask = storage.upload(data);
+
+    // Track upload progress
+    console.log('🔄 Generating CommP...');
+    const commp = await uploadTask.commp();
+    console.log(`✅ Generated CommP: ${commp}`);
+
+    console.log('🏪 Finding storage provider...');
+    const sp = await uploadTask.store();
+    console.log(`✅ Stored with provider: ${sp}`);
+
+    console.log('⏳ Finalizing upload...');
+    const txHash = await uploadTask.done();
+    console.log(`✅ Upload complete! Transaction: ${txHash}`);
+
+    // Store the CommP for later retrieval
+    const metadataPath = path.join(filesDir, 'uploaded-files.json');
+    let metadata = {};
+
+    if (await fs.pathExists(metadataPath)) {
+      metadata = await fs.readJson(metadataPath);
+    }
+
+    metadata[path.basename(testFilePath)] = {
+      commp: commp,
+      uploadDate: new Date().toISOString(),
+      txHash: txHash,
+      size: data.length
+    };
+
+    await fs.writeJson(metadataPath, metadata, { spaces: 2 });
+    console.log(`📋 Metadata saved to: ${metadataPath}`);
+
+    return { commp, txHash };
+
+  } catch (error) {
+    console.error('❌ Upload failed:', error.message);
+    throw error;
+  }
+}
+
+// Run if called directly
+if (require.main === module) {
+  uploadFile()
+    .then(({ commp, txHash }) => {
+      console.log('\n🎉 Upload successful!');
+      console.log(`CommP: ${commp}`);
+      console.log(`Transaction: ${txHash}`);
+      console.log('\nNext: Try downloading with node download-file.js');
+    })
+    .catch(error => {
+      console.error('❌ Error:', error.message);
+      process.exit(1);
+    });
+}
+
+module.exports = { uploadFile };
 ```
 
-## Step 4: Run Your First Script
+## 6. Test Your Setup
 
-Run the script to verify your connection:
+### Run the Basic Setup
 
 ```bash
 node index.js
 ```
 
-You should see output similar to:
-
+**Expected Output:**
 ```
-Connected to Filecoin Calibration Testnet
-Current block number: 1234567
-Next proof set ID: 42
-Maximum proving period: 60 epochs
-```
+🚀 Starting Synapse SDK Demo...
+[Mock] Synapse initialized with options: { withCDN: true, rpcAPI: 'https://api.calibration.node.glif.io/rpc/v1', serviceContract: '0x6170dE2b09b404776197485F3dc6c968Ef948505' }
+✅ Synapse SDK initialized
+💰 Checking balance...
+[Mock] Checking balance...
+Current balance: 100 USDFC
+🗄️ Creating storage service...
+[Mock] Creating storage service...
+[Mock] Storage service created with proofSetId: ps_abc123, SP: f01234
+✅ Storage service created
 
-## Step 5: Create a Payment Rail
+🎉 Setup complete! Ready to store files.
 
-Let's create a payment rail between two addresses:
-
-```javascript
-async function createPaymentRail() {
-  const tokenAddress = '0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0'; // USDFC on Calibration
-  const fromAddress = wallet.address; // Your address
-  const toAddress = '0x...'; // Recipient address
-  const arbiterAddress = ethers.constants.AddressZero; // No arbiter for now
-  const paymentRate = ethers.utils.parseUnits('0.01', 6); // 0.01 USDFC per epoch
-  const lockupPeriod = 60; // 60 epochs
-  const lockupFixed = ethers.utils.parseUnits('1', 6); // 1 USDFC fixed lockup
-  const commissionRate = 0; // No commission
-  
-  console.log('Creating payment rail...');
-  
-  // First, approve the Payments contract to spend your tokens
-  const tokenAbi = ['function approve(address spender, uint256 amount) returns (bool)'];
-  const token = new ethers.Contract(tokenAddress, tokenAbi, wallet);
-  
-  const approvalAmount = ethers.utils.parseUnits('100', 6); // 100 USDFC
-  const approveTx = await token.approve(paymentsAddress, approvalAmount);
-  await approveTx.wait();
-  console.log('Token approval confirmed');
-  
-  // Deposit funds into the Payments contract
-  const depositAmount = ethers.utils.parseUnits('10', 6); // 10 USDFC
-  const depositTx = await payments.deposit(tokenAddress, wallet.address, depositAmount);
-  await depositTx.wait();
-  console.log('Deposit confirmed');
-  
-  // Create the payment rail
-  const tx = await payments.createRail(
-    tokenAddress,
-    fromAddress,
-    toAddress,
-    arbiterAddress,
-    paymentRate,
-    lockupPeriod,
-    lockupFixed,
-    commissionRate
-  );
-  
-  const receipt = await tx.wait();
-  const railId = receipt.events[0].args.railId;
-  console.log(`Created payment rail with ID: ${railId}`);
-  
-  return railId;
-}
+Next steps:
+1. Run: node upload-file.js
+2. Follow the prompts to upload a file
 ```
 
-## Step 6: Create a Proof Set
+### Run the File Upload
 
-Now, let's create a proof set in the PDP system:
-
-```javascript
-async function createProofSet(railId) {
-  // Encode the payment rail ID in the extra data
-  const extraData = ethers.utils.defaultAbiCoder.encode(
-    ['uint256', 'address'],
-    [railId, paymentsAddress]
-  );
-  
-  console.log('Creating proof set...');
-  
-  // Calculate the sybil fee
-  const sybilFee = await pdpVerifier.sybilFee();
-  console.log(`Sybil fee: ${ethers.utils.formatEther(sybilFee)} tFIL`);
-  
-  // Create the proof set
-  const tx = await pdpVerifier.createProofSet(
-    pdpServiceAddress,
-    extraData,
-    { value: sybilFee }
-  );
-  
-  const receipt = await tx.wait();
-  const proofSetId = receipt.events[0].args.setId;
-  console.log(`Created proof set with ID: ${proofSetId}`);
-  
-  return proofSetId;
-}
+```bash
+node upload-file.js
 ```
 
-## Step 7: Add Data to the Proof Set
+**Expected Output:**
+```
+📁 File Upload Demo
+📝 Created test file: /path/to/files/test-image.txt
+📤 Uploading file: test-image.txt (123 bytes)
+🔄 Generating CommP...
+[Mock] Generating CommP for 123 bytes...
+✅ Generated CommP: baga6ea4seaqao7s73y24kcutaosvacpdjgfe5pw2zvogkbo6kqj375dposbngqq
+🏪 Finding storage provider...
+[Mock] Finding storage provider...
+✅ Stored with provider: f01234
+⏳ Finalizing upload...
+[Mock] Finalizing upload...
+✅ Upload complete! Transaction: 0x1234567890abcdef...
+📋 Metadata saved to: /path/to/files/uploaded-files.json
 
-To add data to the proof set, you'll need to prepare a CID and its size:
+🎉 Upload successful!
+CommP: baga6ea4seaqao7s73y24kcutaosvacpdjgfe5pw2zvogkbo6kqj375dposbngqq
+Transaction: 0x1234567890abcdef...
 
-```javascript
-async function addDataToProofSet(proofSetId) {
-  // This is a simplified example - in a real application, you would:
-  // 1. Create a CAR file from your data
-  // 2. Calculate the CID
-  // 3. Determine the size
-  
-  // For this example, we'll use a dummy CID
-  const cidVersion = 1;
-  const cidCodec = 0x71; // dag-cbor
-  const cidHash = 0x12; // sha2-256
-  const cidSize = 32;
-  const cidData = ethers.utils.randomBytes(32); // Random bytes for demo
-  
-  const rootCid = {
-    version: cidVersion,
-    codec: cidCodec,
-    hash: cidHash,
-    size: cidSize,
-    data: cidData
-  };
-  
-  const dataSize = 1024 * 1024; // 1 MB for demo
-  
-  const rootData = [{
-    root: rootCid,
-    rawSize: dataSize
-  }];
-  
-  console.log('Adding data to proof set...');
-  
-  // Add the root to the proof set
-  const tx = await pdpVerifier.addRoots(
-    proofSetId,
-    rootData,
-    '0x' // No extra data
-  );
-  
-  await tx.wait();
-  console.log('Data added to proof set');
-}
+Next: Try downloading with node download-file.js
 ```
 
-## Step 8: Update Your Main Function
+## 7. Understanding the SDK Flow
 
-Update your `main` function to use these new functions:
+### What Just Happened?
 
-```javascript
-async function main() {
-  console.log('Connected to Filecoin Calibration Testnet');
-  
-  // Create a payment rail
-  const railId = await createPaymentRail();
-  
-  // Create a proof set
-  const proofSetId = await createProofSet(railId);
-  
-  // Add data to the proof set
-  await addDataToProofSet(proofSetId);
-  
-  console.log('Quick start complete!');
-  console.log(`Payment Rail ID: ${railId}`);
-  console.log(`Proof Set ID: ${proofSetId}`);
-}
+1. **Initialization**: The SDK connected to the Filecoin network using your configuration
+2. **Balance Check**: Verified you have sufficient USDFC for storage payments
+3. **Storage Service**: Created a storage service instance linked to a storage provider
+4. **File Upload**:
+   - Generated a CommP (Commitment of Piece) - a cryptographic proof of your data
+   - Found an available storage provider
+   - Initiated the storage deal
+   - Returned a transaction hash for verification
+
+### Key Concepts
+
+- **CommP**: A unique identifier for your data that enables proof verification
+- **Storage Provider (SP)**: The entity that will store your data
+- **Proof Set**: A collection of data that will be proven together
+- **Payment Rail**: The mechanism for paying the storage provider
+
+## Troubleshooting
+
+### Common Issues
+
+**SDK Import Error**
+```bash
+npm install synapse-sdk --save
 ```
+
+**Environment Variables Not Found**
+- Ensure your `.env` file is in the project root
+- Check that variable names match exactly
+
+**Balance Issues**
+- Verify you have USDFC tokens from Step 1
+- Check your wallet connection
+
+**File Upload Fails**
+- Ensure the `files/` directory exists
+- Check file permissions
 
 ## Next Steps
 
-Now that you've created a basic integration with FilOz, you can:
+🎉 **Congratulations!** You've completed Step 3 of the Golden Path.
 
-1. **Implement Proof Submission**: Learn how to [submit proofs](pdp/guides/submitting-proofs.md) to demonstrate data possession
-2. **Settle Payments**: Explore how to [settle payments](payments/guides/first-rail.md#step-6-settle-payments) on your payment rail
-3. **Implement an Arbiter**: Create a custom [arbiter contract](payments/guides/custom-arbiter.md) to adjust payments based on proof compliance
-4. **Explore the Hot Vault Demo**: See a complete implementation in the [Hot Vault Demo](examples/hot-vault.md)
+**Next**: [Step 4: Hot Vault Demo Reference](examples/hot-vault.md) - Explore a complete implementation with code snippets
 
 ## Additional Resources
 
-- [PDP Overview](pdp/concepts/overview.md)
-- [Payments Overview](payments/concepts/overview.md)
-- [Integrating PDP with Payments](integration/pdp-payments.md)
-- [API References](index.md#payments-api-reference)
+- [Synapse SDK Documentation](https://github.com/FilOzone/synapse-sdk)
+- [Understanding CommP](https://docs.filecoin.io/basics/the-blockchain/proofs/)
+- [Storage Provider Guide](https://docs.filecoin.io/storage-providers/basics/)

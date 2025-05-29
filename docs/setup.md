@@ -1,236 +1,106 @@
-# Setting Up Your Environment for PDP-Payments (FWS)
+# Step 1: Setup Wallet & USDFC Tokens
 
-This guide will walk you through setting up your development environment for working with the PDP-Payments (FWS) system, including both the Provable Data Possession (PDP) and Payments components.
+This is the first step in your Golden Path to success with PDP-Payments. You'll set up MetaMask with the Filecoin Calibration testnet and obtain USDFC stablecoin tokens for payments.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+- **Google Chrome browser** (recommended for best compatibility)
+- **MetaMask browser extension** installed
+- **Disable all other wallet extensions** (to avoid conflicts)
 
-- [Node.js](https://nodejs.org/) (v16 or later)
-- [npm](https://www.npmjs.com/) (v7 or later)
-- [Git](https://git-scm.com/)
-- [MetaMask](https://metamask.io/) or another Ethereum wallet
-- Basic knowledge of Ethereum and smart contracts
+## 1. Install and Configure MetaMask
 
-## Step 1: Set Up Your Blockchain Environment
+### Install MetaMask
+1. Visit [metamask.io](https://metamask.io/download.html)
+2. Install the MetaMask extension for Chrome
+3. Create a new wallet or import an existing one
+4. **Important**: Disable all other wallet extensions to prevent conflicts
 
-### Connect to Filecoin Calibration Testnet
+### Add Filecoin Calibration Testnet
+1. Visit [Chainlist for Filecoin Calibration](https://chainlist.org/chain/314159)
+2. Click "Connect Wallet" and approve the connection
+3. Click "Add to MetaMask" for Filecoin Calibration Testnet
+4. Approve adding the network in MetaMask
 
-For development and testing, we recommend using the Filecoin Calibration Testnet:
+**Manual Setup (if needed):**
+- Network Name: `Filecoin — Calibration Testnet`
+- RPC URL: `https://api.calibration.node.glif.io/rpc/v1`
+- Chain ID: `314159`
+- Currency Symbol: `tFIL`
+- Block Explorer: `https://calibration.filfox.info/`
 
-1. Open MetaMask and add the Filecoin Calibration Testnet:
-   - Network Name: `Filecoin Calibration Testnet`
-   - RPC URL: `https://calibration.filfox.info/rpc/v1`
-   - Chain ID: `314159`
-   - Currency Symbol: `tFIL`
-   - Block Explorer URL: `https://calibration.filfox.info/`
+## 2. Get Test FIL (tFIL) Tokens
 
-2. Get some test tokens:
-   - Visit the [Filecoin Faucet](https://faucet.calibration.fildev.network/)
-   - Enter your wallet address
-   - Receive test tFIL
+1. Copy your wallet address from MetaMask
+2. Visit the [Calibration Faucet](https://faucet.calibnet.chainsafe-fil.io/)
+3. Paste your address and click "Send Funds"
+4. You'll receive 100 tFIL (can request every 12 hours, max 2 times)
+5. Verify the tokens appear in your MetaMask wallet
 
-### Get Test USDC Tokens
+## 3. Get USDFC Stablecoin Tokens
 
-For payment functionality, you'll need test USDC tokens:
+USDFC is the stablecoin used for payments in the PDP system. You'll mint USDFC by depositing tFIL as collateral.
 
-1. Visit a testnet USDC faucet (specific to Filecoin Calibration)
-2. Request test USDC tokens to your wallet address
-3. Verify the tokens appear in your wallet
+> **✅ Testnet Confirmation**: The USDFC protocol at [usdfc.secured.finance](https://usdfc.secured.finance/#/) **does support Filecoin Calibration testnet**. When you connect, make sure you're on the "Filecoin — Calibration Network" to mint testnet USDFC using your testnet tFIL.
 
-## Step 2: Clone the Repository
+### Access the USDFC Protocol
+1. Visit [usdfc.secured.finance](https://usdfc.secured.finance/#/)
+2. **Important**: Ensure you're connected to "Filecoin — Calibration Network" (not mainnet)
+3. Click "Connect Wallet" and select MetaMask
 
-Clone the PDP-Payments (FWS) repository to your local machine:
+### Mint USDFC Tokens
+1. Click "Open Trove" in the top-left section
+2. **Set Collateral Amount**: Enter amount of tFIL to deposit (e.g., 50 tFIL)
+3. **Set Borrow Amount**: Enter USDFC to mint (keep collateral ratio above 150%)
+   - Example: 50 tFIL → mint ~30 USDFC (167% collateral ratio)
+4. Review the details:
+   - **Liquidation Reserve**: 20 USDFC (refundable when closing trove)
+   - **Borrowing Fee**: 0.5% one-time fee
+   - **Total Debt**: Borrow amount + reserve + fee
+5. Click "Confirm" and approve the MetaMask transaction
 
-```bash
-git clone https://github.com/timfong888/pdp-payment.git
-cd pdp-payment
-```
+### Add USDFC Token to MetaMask
+1. In MetaMask, click "Import tokens"
+2. Enter USDFC contract address: `0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0`
+3. Token symbol: `USDFC`
+4. Decimals: `18`
+5. Click "Add Custom Token"
 
-## Step 3: Install Dependencies
+## 4. Verify Your Setup
 
-Install the required dependencies:
+You should now have:
+- ✅ MetaMask connected to Filecoin Calibration testnet
+- ✅ tFIL tokens in your wallet (for gas fees)
+- ✅ USDFC tokens in your wallet (for storage payments)
+- ✅ USDFC token visible in MetaMask
 
-```bash
-npm install
-```
-
-This will install all the necessary packages, including:
-- ethers.js for blockchain interactions
-- dotenv for environment variable management
-- Other dependencies required by the project
-
-## Step 4: Configure Environment Variables
-
-Create a `.env` file in the root directory of the project:
-
-```bash
-touch .env
-```
-
-Add the following environment variables to the `.env` file:
-
-```
-# Private key (without 0x prefix)
-PRIVATE_KEY=your_private_key_here
-
-# Contract addresses
-PDP_VERIFIER_ADDRESS=0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC
-PDP_SERVICE_ADDRESS=0x6170dE2b09b404776197485F3dc6c968Ef948505
-PAYMENTS_ADDRESS=0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A
-
-# RPC URL
-RPC_URL=https://calibration.filfox.info/rpc/v1
-
-# Token address (USDC on Calibration)
-TOKEN_ADDRESS=0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0
-```
-
-**Important**: Never commit your `.env` file to version control. Make sure it's included in your `.gitignore` file.
-
-## Step 5: Set Up Contract ABIs
-
-Create a directory for ABIs and download the necessary ABI files:
-
-```bash
-mkdir -p abis
-```
-
-You'll need the following ABI files:
-- PDPVerifier.json
-- SimplePDPService.json
-- Payments.json
-
-These can be obtained from the contract repositories or compiled from the contract source code.
-
-## Step 6: Verify Your Setup
-
-Create a simple script to verify your setup:
-
-```javascript
-// verify-setup.js
-require('dotenv').config();
-const ethers = require('ethers');
-
-// Contract ABIs
-const pdpVerifierAbi = require('./abis/PDPVerifier.json');
-const pdpServiceAbi = require('./abis/SimplePDPService.json');
-const paymentsAbi = require('./abis/Payments.json');
-
-// Environment variables
-const privateKey = process.env.PRIVATE_KEY;
-const pdpVerifierAddress = process.env.PDP_VERIFIER_ADDRESS;
-const pdpServiceAddress = process.env.PDP_SERVICE_ADDRESS;
-const paymentsAddress = process.env.PAYMENTS_ADDRESS;
-const rpcUrl = process.env.RPC_URL;
-
-// Provider and signer
-const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-const wallet = new ethers.Wallet(privateKey, provider);
-
-// Contract instances
-const pdpVerifier = new ethers.Contract(pdpVerifierAddress, pdpVerifierAbi, wallet);
-const pdpService = new ethers.Contract(pdpServiceAddress, pdpServiceAbi, wallet);
-const payments = new ethers.Contract(paymentsAddress, paymentsAbi, wallet);
-
-async function main() {
-  console.log('Connected to Filecoin Calibration Testnet');
-  
-  // Get the current block number
-  const blockNumber = await provider.getBlockNumber();
-  console.log(`Current block number: ${blockNumber}`);
-  
-  // Get the next proof set ID
-  const nextProofSetId = await pdpVerifier.getNextProofSetId();
-  console.log(`Next proof set ID: ${nextProofSetId}`);
-  
-  // Get the maximum proving period
-  const maxProvingPeriod = await pdpService.getMaxProvingPeriod();
-  console.log(`Maximum proving period: ${maxProvingPeriod} epochs`);
-  
-  // Get wallet balance
-  const balance = await provider.getBalance(wallet.address);
-  console.log(`Wallet balance: ${ethers.utils.formatEther(balance)} tFIL`);
-  
-  console.log('Setup verification complete!');
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error);
-    process.exit(1);
-  });
-```
-
-Run the verification script:
-
-```bash
-node verify-setup.js
-```
-
-If everything is set up correctly, you should see output similar to:
-
-```
-Connected to Filecoin Calibration Testnet
-Current block number: 1234567
-Next proof set ID: 42
-Maximum proving period: 60 epochs
-Wallet balance: 1.5 tFIL
-Setup verification complete!
-```
-
-## Step 7: Set Up Development Tools
-
-For a better development experience, we recommend setting up the following tools:
-
-### Hardhat (for contract development and testing)
-
-```bash
-npm install --save-dev hardhat
-npx hardhat init
-```
-
-### Solidity Extension for VS Code
-
-If you're using Visual Studio Code, install the Solidity extension:
-- Open VS Code
-- Go to Extensions (Ctrl+Shift+X)
-- Search for "Solidity" and install the extension by Juan Blanco
-
-## Step 8: Explore the Documentation
-
-Now that your environment is set up, explore the rest of the documentation to learn how to use the PDP-Payments (FWS) system:
-
-- [PDP Overview](pdp-overview.md): Understand the Provable Data Possession system
-- [Payments Overview](payments-overview.md): Learn about the Payments system
-- [Integration Guide](integration-guide.md): See how to integrate PDP with Payments
-- [Quick Start](quick-start.md): Follow a quick start guide to build your first application
-- [Hot Vault Example](examples/hot-vault.md): Explore a complete example implementation
+**Recommended Amounts:**
+- **Minimum**: 10 tFIL + 10 USDFC
+- **Recommended**: 50 tFIL + 30 USDFC
 
 ## Troubleshooting
 
-### Connection Issues
+### MetaMask Issues
+- **Wrong network**: Ensure you're on "Filecoin — Calibration Testnet"
+- **No tokens showing**: Try refreshing MetaMask or re-importing the USDFC token
+- **Transaction fails**: Ensure you have enough tFIL for gas fees
 
-If you're having trouble connecting to the Filecoin Calibration Testnet:
-- Verify your RPC URL is correct
-- Check if the network is experiencing any issues
-- Try using a different RPC endpoint
+### Faucet Issues
+- **Rate limited**: Wait 12 hours between requests
+- **Need more tokens**: Contact the team on [Filecoin Slack](https://filecoin.io/slack) #fil-pdp channel
 
-### Contract Interaction Errors
-
-If you encounter errors when interacting with contracts:
-- Ensure you have the correct contract addresses
-- Verify your ABI files match the deployed contracts
-- Check if you have sufficient tFIL for gas fees
-
-### Token Issues
-
-If you're having trouble with tokens:
-- Verify you have the correct token address
-- Ensure you have sufficient token balance
-- Check if you've approved the Payments contract to spend your tokens
+### USDFC Minting Issues
+- **Collateral ratio too low**: Increase tFIL deposit or decrease USDFC borrow amount
+- **Transaction fails**: Ensure you have enough tFIL for gas fees
 
 ## Next Steps
 
-After setting up your environment, proceed to the [Quick Start Guide](quick-start.md) to begin building with the PDP-Payments (FWS) system.
+🎉 **Congratulations!** You've completed Step 1 of the Golden Path.
+
+**Next**: [Step 2: Configure JSON-RPC](setup-detailed.md) - Set up Filecoin JSON-RPC for blockchain interactions
+
+## Additional Resources
+
+- [USDFC Stablecoin Documentation](https://docs.secured.finance/)
+- [Filecoin Calibration Network Info](https://docs.filecoin.io/networks/calibration/)
+- [MetaMask Setup Guide](https://docs.filecoin.io/basics/assets/metamask-setup/)
