@@ -75,24 +75,31 @@ The integration between PDP and Payments enables:
 
 ## Getting Started
 
-### 🚀 Golden Path: Your First Success
+### 🚀 Choose Your Path to Success
 
-**Are you building an app or developing contracts?**
+**What do you want to build?**
 
-#### 📱 **App Developer Path** (Recommended for most users)
-Build apps using existing PDP-Payments contracts - no contract development needed:
+#### 📱 **Developer Path: Build Apps Fast** (Recommended)
+Use the Synapse SDK for rapid development with integrated PDP + Payments:
 
-1. **[Setup Wallet & USDFC](docs/setup.md)** - Configure MetaMask with Calibration testnet and get USDFC tokens
-2. **[Configure JSON-RPC](docs/setup-detailed.md)** - Set up Filecoin JSON-RPC for blockchain interactions
-3. **[Install Synapse SDK](docs/quick-start.md)** - Create a local app using the Synapse SDK
-4. **[Store Your First File](docs/first-deal.md)** - Upload a photo from your desktop to a storage provider
-5. **[Verify Storage Proof](docs/pdp-overview.md)** - Confirm your file is being stored with cryptographic proofs
-6. **[Retrieve Your File](docs/examples/hot-vault.md)** - Download your stored file back to your device
+**⚡ 5-Minute Hello World**
+1. **[Setup Wallet & USDFC](docs/setup.md)** - Get testnet tokens (shared setup)
+2. **[Quick SDK Setup](docs/sdk-quickstart.md)** - Install and initialize Synapse SDK
+3. **[Complete Workflow](docs/sdk-workflow.md)** - Store file + handle payments in ~20 lines
+4. **[Monitor & Verify](docs/sdk-monitoring.md)** - Track storage proofs and payments
 
-#### ⚙️ **Contract Developer Path** (Advanced users)
-Deploy custom contracts or modify existing ones:
-- Follow the App Developer Path above, then
-- [Contract Development Guide](docs/contracts/development.md) - Hardhat/Foundry setup for custom contracts
+**💡 Why SDK?** Abstract away complexity - automatic payment escrow, built-in settlement, simple balance management.
+
+#### 🤖 **AI Agent Path: Maximum Control** (Advanced)
+Direct contract interactions for full technical control:
+
+**🔧 Technical Deep Dive**
+1. **[Setup Wallet & USDFC](docs/setup.md)** - Get testnet tokens (shared setup)
+2. **[Blockchain Configuration](docs/setup-detailed.md)** - JSON-RPC, Viem patterns, environment setup
+3. **[Contract Integration](docs/contracts-guide.md)** - Direct PDP and Payment contract calls
+4. **[Advanced Patterns](docs/examples/hot-vault.md)** - Production-ready Wagmi v2 + Next.js examples
+
+**🎯 Why Contracts?** Full control over every transaction, custom logic, advanced error handling.
 
 ### 📚 Deep Dive Documentation
 

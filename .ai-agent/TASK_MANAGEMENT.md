@@ -183,8 +183,41 @@ This task management file tracks the autonomous technical documentation generati
 - Modern TypeScript patterns for contract interactions
 - Real-world code examples from production libraries
 
-**Next Priority**: Complete remaining Golden Path steps (5-7) focusing on:
-- Photo storage workflow tutorial
-- Proof verification guide
-- File retrieval process
+**Strategic Pivot**: Based on Synapse SDK analysis, implementing dual-path architecture:
+
+### 🎯 **New Dual-Path Documentation Architecture**
+
+**Key Discovery**: Synapse SDK includes full PDP + Payments integration, making it ideal for developer-focused documentation.
+
+#### 📱 **Developer Path (SDK-First)**: Complete PDP + Payments Workflow
+- **Goal**: 5-minute hello world with integrated payments
+- **Audience**: Developers who want to build apps quickly
+- **Value**: ~20 lines of code vs 200+ with raw contracts
+- **Focus**: SDK abstracts complexity of coordinating PDP proofs with USDFC payments
+
+#### 🤖 **AI Agent Path (Contract-Direct)**: Maximum Technical Control
+- **Goal**: Full technical detail and contract-level control
+- **Audience**: AI agents and advanced developers
+- **Value**: Complete access to all contract functionality
+- **Focus**: Direct Wagmi/Viem contract interactions with full technical detail
+
+### ✅ **Implementation Tasks**
+
+#### Phase 2B: Dual-Path Implementation
+- [x] **Create SDK Golden Path** (Developer-focused)
+  - [x] Step 1: Quick SDK Setup (`docs/sdk-quickstart.md`)
+  - [x] Step 2: Complete Storage + Payment Workflow (`docs/sdk-workflow.md`)
+  - [x] Step 3: Monitor & Verify (`docs/sdk-monitoring.md`)
+  - [x] Step 4: Production Deployment (`docs/sdk-production.md`)
+
+- [ ] **Reorganize Contract Path** (AI Agent-focused)
+  - [ ] Move existing technical docs to AI Agent path
+  - [ ] Create contract integration guide (`docs/contracts-guide.md`)
+  - [ ] Create PDP technical implementation (`docs/pdp-technical.md`)
+  - [ ] Create payment technical implementation (`docs/payments-technical.md`)
+
+- [x] **Update Navigation & README**
+  - [x] Clear path separation in README.md
+  - [x] Update all cross-references
+  - [x] Add value proposition for each path
 
