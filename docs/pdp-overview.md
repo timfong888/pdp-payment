@@ -270,6 +270,27 @@ The PDP service contract and the PDP verifier contracts are deployed on Filecoin
 - **PDP Verifier**: `0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC`
 - **PDP Service**: `0x6170dE2b09b404776197485F3dc6c968Ef948505`
 
+## Integration with Payments
+
+The PDP system integrates with the [Payments system](payments-overview.md) through:
+
+1. **Arbiter Contracts**: These contracts use fault records from the PDP system to determine payment adjustments.
+
+2. **Payment Rails**: Payments flow from clients to storage providers through these rails, with adjustments based on PDP compliance.
+
+3. **Settlement**: When a rail is settled, the arbiter can reduce payments for providers who have failed to meet their PDP obligations.
+
+For a detailed guide on integrating PDP with Payments, see [Integrating PDP with Payments](integration/pdp-payments.md).
+
+## Security Considerations
+
+The PDP system includes several security features:
+
+- **Challenge Finality Delay**: Prevents randomness manipulation by storage providers
+- **Sybil Fees**: Prevents spam attacks on the system
+- **Proof Fees**: Compensates for verification costs
+- **Cryptographic Verification**: Ensures proofs are valid and correspond to the correct data
+
 ## Next Steps
 
 - Learn about the [Payments System](payments-overview.md)

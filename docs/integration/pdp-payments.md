@@ -1,6 +1,6 @@
 # Integrating PDP with Payments
 
-This guide explains how to integrate the [Provable Data Possession (PDP)](../pdp/concepts/overview.md) system with the [Payments](../payments/concepts/overview.md) system to create a complete solution for verifiable storage with automatic payment adjustments based on service level compliance.
+This guide explains how to integrate the [Provable Data Possession (PDP)](../pdp-overview.md) system with the [Payments](../payments/concepts/overview.md) system to create a complete solution for verifiable storage with automatic payment adjustments based on service level compliance.
 
 ## Overview
 
