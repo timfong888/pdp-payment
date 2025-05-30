@@ -16,7 +16,7 @@ They are where the source code is for the intended documentation.
 
 The primary interface for developers will be directly with the SDK (`synapse-sdk`)
 
-However, the other repos represent the related primitives:
+However, the other repos represent the related primitives that a developer who wants to work directly with contracts (and probably do so with the help of AI) would want to reference.
 
 1. https://github.com/FilOzone/synapse-sdk (`synapse-sdk`)
 2. https://github.com/FilOzone/pdp (`pdp`)
