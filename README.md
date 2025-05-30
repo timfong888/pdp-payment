@@ -6,11 +6,10 @@ This repository contains comprehensive documentation for the PDP-Payments (FWS) 
 
 - [Overview](#overview)
 - [Getting Started](#getting-started)
+- [Synapse SDK](#synapse-sdk)
 - [Key Components](#key-components)
 - [Documentation](#documentation)
 - [Deployed Contracts](#deployed-contracts)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Overview
 
@@ -30,13 +29,13 @@ This documentation repository serves as a central resource for understanding how
 **What do you want to build?**
 
 #### 📱 **Developer Path: Build Apps Fast** (Recommended)
-Use the Synapse SDK for rapid development with integrated PDP + Payments:
+Use the [Synapse SDK](https://github.com/FilOzone/synapse-sdk) for rapid development with integrated PDP + Payments:
 
 **⚡ 5-Minute Hello World**
 1. **[Setup Wallet & USDFC](docs/setup.md)** - Get testnet tokens (shared setup)
-2. **[Quick SDK Setup](docs/sdk-quickstart.md)** - Install and initialize Synapse SDK
-3. **[Complete Workflow](docs/sdk-workflow.md)** - Store file + handle payments in ~20 lines
-4. **[Monitor & Verify](docs/sdk-monitoring.md)** - Track storage proofs and payments
+2. **[Quick SDK Setup](docs/sdk/sdk-quickstart.md)** - Install and initialize Synapse SDK
+3. **[Complete Workflow](docs/sdk/sdk-workflow.md)** - Store file + handle payments in ~20 lines
+4. **[Monitor & Verify](docs/sdk/sdk-monitoring.md)** - Track storage proofs and payments
 
 **💡 Why SDK?** Abstract away complexity - automatic payment escrow, built-in settlement, simple balance management.
 
@@ -92,9 +91,9 @@ await uploadTask.done()
 
 ### Documentation & Resources
 
-- **[SDK Quick Start Guide](docs/sdk-quickstart.md)** - Get started in 5 minutes
-- **[Complete Workflow Tutorial](docs/sdk-workflow.md)** - End-to-end storage + payments
-- **[Production Deployment Guide](docs/sdk-production.md)** - Scale to production
+- **[SDK Quick Start Guide](docs/sdk/sdk-quickstart.md)** - Get started in 5 minutes
+- **[Complete Workflow Tutorial](docs/sdk/sdk-workflow.md)** - End-to-end storage + payments
+- **[Production Deployment Guide](docs/sdk/sdk-production.md)** - Scale to production
 - **[SDK Repository](https://github.com/FilOzone/synapse-sdk)** - Source code and advanced documentation
 
 ## Key Components
@@ -127,7 +126,7 @@ The integration between PDP and Payments enables:
 
 - [Quick Start](docs/quick-start.md): Quick start guide for developers
 - [PDP Overview](docs/pdp-overview.md): Detailed explanation of the PDP system
-- [SDK Documentation](docs/sdk-quickstart.md): Comprehensive Synapse SDK guides and tutorials
+- [SDK Documentation](docs/sdk/sdk-quickstart.md): Comprehensive Synapse SDK guides and tutorials
 - [Payments Overview](docs/payments-overview.md): Detailed explanation of the Payments system
 - [Payment Rails](docs/payments/payment-rails.md): Documentation on payment rails
 - [Integration Guide](docs/integration/pdp-payments.md): Guide for integrating PDP with Payments
