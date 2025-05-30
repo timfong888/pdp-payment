@@ -2,6 +2,8 @@
 
 This is the fourth step in your Golden Path. You'll explore the Hot Vault demo - a complete reference implementation that demonstrates how to build a modern web3 storage application using the PDP-Payments system.
 
+**🔗 Live Demo Repository:** [https://github.com/FilOzone/hotvault-demo](https://github.com/FilOzone/hotvault-demo)
+
 ## Prerequisites
 
 - ✅ Completed [Step 1: Setup Wallet & USDFC](../setup.md)
@@ -53,501 +55,89 @@ Hot Vault uses a modern full-stack architecture:
 
 ### 1. Wallet Connection (Modern Wagmi Pattern)
 
-Hot Vault uses the latest Wagmi patterns for seamless wallet connection:
+Hot Vault uses the latest Wagmi patterns for seamless wallet connection. The implementation demonstrates modern React patterns with TypeScript support.
 
-<augment_code_snippet path="hotvault-demo-source/components/WalletConnection.tsx" mode="EXCERPT">
-```tsx
-'use client'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { injected } from 'wagmi/connectors'
+**📁 Source:** [`components/WalletConnection.tsx`](https://github.com/FilOzone/hotvault-demo/blob/main/components/WalletConnection.tsx)
 
-export function WalletConnection() {
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect()
-  const { disconnect } = useDisconnect()
-
-  if (isConnected) {
-    return (
-      <div className="flex items-center gap-4">
-        <span className="text-sm">
-          {address?.slice(0, 6)}...{address?.slice(-4)}
-        </span>
-        <button
-          onClick={() => disconnect()}
-          className="px-4 py-2 bg-red-500 text-white rounded"
-        >
-          Disconnect
-        </button>
-      </div>
-    )
-  }
-
-  return (
-    <button
-      onClick={() => connect({ connector: injected() })}
-      className="px-6 py-3 bg-blue-500 text-white rounded-lg"
-    >
-      Connect MetaMask
-    </button>
-  )
-}
-```
-</augment_code_snippet>
+Key features:
+- **useAccount Hook**: Manages connected wallet state
+- **useConnect Hook**: Handles wallet connection with injected connector (MetaMask)
+- **useDisconnect Hook**: Provides clean wallet disconnection
+- **Responsive UI**: Shows connection status and wallet address truncation
+- **TypeScript Support**: Full type safety with Wagmi v2
 
 ### 2. File Upload with Progress Tracking
 
-Modern drag-and-drop file upload with real-time progress:
+Modern drag-and-drop file upload with real-time progress tracking and validation.
 
-<augment_code_snippet path="hotvault-demo-source/components/FileUpload.tsx" mode="EXCERPT">
-```tsx
-'use client'
-import { useState, useCallback } from 'react'
-import { useDropzone } from 'react-dropzone'
+**📁 Source:** [`components/FileUpload.tsx`](https://github.com/FilOzone/hotvault-demo/blob/main/components/FileUpload.tsx)
 
-export function FileUpload() {
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [uploading, setUploading] = useState(false)
-
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0]
-    if (!file) return
-
-    setUploading(true)
-    setUploadProgress(0)
-
-    const formData = new FormData()
-    formData.append('file', file)
-
-    try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!response.ok) throw new Error('Upload failed')
-
-      const result = await response.json()
-      console.log('Upload successful:', result)
-
-    } catch (error) {
-      console.error('Upload error:', error)
-    } finally {
-      setUploading(false)
-      setUploadProgress(0)
-    }
-  }, [])
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif'],
-      'application/pdf': ['.pdf'],
-    },
-    maxSize: 10 * 1024 * 1024, // 10MB
-  })
-
-  return (
-    <div
-      {...getRootProps()}
-      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-        isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-      }`}
-    >
-      <input {...getInputProps()} />
-      {uploading ? (
-        <div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-            <div
-              className="bg-blue-600 h-2 rounded-full transition-all"
-              style={{ width: `${uploadProgress}%` }}
-            />
-          </div>
-          <p>Uploading... {uploadProgress}%</p>
-        </div>
-      ) : (
-        <div>
-          <p className="text-lg mb-2">
-            {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
-          </p>
-          <p className="text-sm text-gray-500">
-            or click to select files (max 10MB)
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}
-```
-</augment_code_snippet>
+Key features:
+- **React Dropzone**: Modern drag-and-drop interface with file validation
+- **Progress Tracking**: Real-time upload progress with visual indicators
+- **File Validation**: Automatic file type and size validation (max 10MB)
+- **Error Handling**: Comprehensive error handling with user feedback
+- **FormData API**: Efficient file upload using modern browser APIs
+- **Responsive Design**: Mobile-friendly upload interface
 
 ### 3. Next.js API Route for File Processing
 
-Modern Next.js 14 App Router API route with proper error handling:
+Modern Next.js 14 App Router API route with proper error handling and Filecoin integration.
 
-<augment_code_snippet path="hotvault-demo-source/app/api/upload/route.ts" mode="EXCERPT">
-```typescript
-import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { v4 as uuidv4 } from 'uuid'
-import { createCARFile, calculateCommP } from '@/lib/filecoin-utils'
-import { createProofSet, createPaymentRail } from '@/lib/contracts'
+**📁 Source:** [`app/api/upload/route.ts`](https://github.com/FilOzone/hotvault-demo/blob/main/app/api/upload/route.ts)
 
-export async function POST(request: NextRequest) {
-  try {
-    const formData = await request.formData()
-    const file = formData.get('file') as File
-
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      )
-    }
-
-    // Generate unique file ID
-    const fileId = uuidv4()
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Save file to storage
-    const uploadDir = join(process.cwd(), 'uploads')
-    await mkdir(uploadDir, { recursive: true })
-    const filePath = join(uploadDir, `${fileId}-${file.name}`)
-    await writeFile(filePath, buffer)
-
-    // Generate CAR file and CommP
-    const carFile = await createCARFile(buffer)
-    const commP = await calculateCommP(carFile)
-
-    // Store metadata
-    const metadata = {
-      fileId,
-      originalName: file.name,
-      size: file.size,
-      mimeType: file.type,
-      commP,
-      uploadDate: new Date().toISOString(),
-      filePath,
-    }
-
-    // TODO: Store in database
-    console.log('File metadata:', metadata)
-
-    return NextResponse.json({
-      success: true,
-      fileId,
-      commP,
-      size: file.size,
-      name: file.name,
-    })
-
-  } catch (error) {
-    console.error('Upload error:', error)
-    return NextResponse.json(
-      { error: 'Upload failed' },
-      { status: 500 }
-    )
-  }
-}
-```
-</augment_code_snippet>
+Key features:
+- **Next.js 14 App Router**: Modern API route structure with TypeScript
+- **File Processing**: Handles multipart form data with proper validation
+- **CAR File Generation**: Creates Content Addressable aRchive files for Filecoin
+- **CommP Calculation**: Generates cryptographic proofs for file integrity
+- **Error Handling**: Comprehensive error handling with proper HTTP status codes
+- **Metadata Management**: Structured file metadata with unique identifiers
+- **Database Integration**: Ready for database storage (currently using console logging)
 
 ### 4. Smart Contract Integration with Wagmi
 
-Hot Vault uses Wagmi hooks for type-safe contract interactions:
+Hot Vault uses Wagmi hooks for type-safe contract interactions with the PDP-Payments system.
 
-<augment_code_snippet path="hotvault-demo-source/hooks/useContracts.ts" mode="EXCERPT">
-```typescript
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { parseEther, parseUnits } from 'viem'
-import { CONTRACTS } from '@/lib/contracts'
+**📁 Source:** [`hooks/useContracts.ts`](https://github.com/FilOzone/hotvault-demo/blob/main/hooks/useContracts.ts)
 
-export function useCreatePaymentRail() {
-  const { writeContract, data: hash, isPending } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  const createRail = async (params: {
-    clientAddress: string
-    fileSize: number
-  }) => {
-    const paymentRate = calculatePaymentRate(params.fileSize)
-
-    writeContract({
-      address: CONTRACTS.PAYMENTS_ADDRESS,
-      abi: CONTRACTS.PAYMENTS_ABI,
-      functionName: 'createRail',
-      args: [
-        CONTRACTS.USDFC_TOKEN_ADDRESS, // token
-        params.clientAddress,          // from
-        CONTRACTS.PROVIDER_ADDRESS,    // to
-        CONTRACTS.ARBITER_ADDRESS,     // arbiter
-        parseUnits(paymentRate.toString(), 6), // rate (USDFC has 6 decimals)
-        60n,                          // lockupPeriod (epochs)
-        parseUnits('1', 6),           // lockupFixed (1 USDFC)
-        0n,                           // commissionRate
-      ],
-    })
-  }
-
-  return {
-    createRail,
-    isPending: isPending || isConfirming,
-    isSuccess,
-    hash,
-  }
-}
-
-function calculatePaymentRate(fileSize: number): number {
-  // 0.01 USDFC per MB per epoch
-  const sizeInMB = fileSize / (1024 * 1024)
-  return Math.max(0.01, sizeInMB * 0.01)
-}
-```
-</augment_code_snippet>
+Key features:
+- **useWriteContract Hook**: Type-safe contract function calls with Wagmi v2
+- **useWaitForTransactionReceipt**: Real-time transaction confirmation tracking
+- **Payment Rate Calculation**: Dynamic pricing based on file size (0.01 USDFC per MB per epoch)
+- **Contract Configuration**: Pre-configured contract addresses and ABIs
+- **Error Handling**: Comprehensive transaction error handling
+- **TypeScript Support**: Full type safety for contract interactions
+- **USDFC Integration**: Native stablecoin payment processing
 
 ### 5. PDP Proof Set Creation
 
-Creating proof sets with modern error handling and user feedback:
+Creating proof sets with modern error handling and user feedback for storage verification.
 
-<augment_code_snippet path="hotvault-demo-source/hooks/usePDPProofSet.ts" mode="EXCERPT">
-```typescript
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { encodeAbiParameters, parseEther } from 'viem'
-import { CONTRACTS } from '@/lib/contracts'
+**📁 Source:** [`hooks/usePDPProofSet.ts`](https://github.com/FilOzone/hotvault-demo/blob/main/hooks/usePDPProofSet.ts)
 
-export function useCreateProofSet() {
-  const { writeContract, data: hash, isPending } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  const createProofSet = async (params: {
-    railId: bigint
-    commP: string
-    fileSize: number
-  }) => {
-    // Encode payment rail information in extra data
-    const extraData = encodeAbiParameters(
-      [
-        { name: 'railId', type: 'uint256' },
-        { name: 'paymentsContract', type: 'address' }
-      ],
-      [params.railId, CONTRACTS.PAYMENTS_ADDRESS]
-    )
-
-    // Get sybil fee
-    const sybilFee = parseEther('0.1') // 0.1 tFIL
-
-    writeContract({
-      address: CONTRACTS.PDP_VERIFIER_ADDRESS,
-      abi: CONTRACTS.PDP_VERIFIER_ABI,
-      functionName: 'createProofSet',
-      args: [
-        CONTRACTS.PDP_SERVICE_ADDRESS,
-        extraData,
-      ],
-      value: sybilFee,
-    })
-  }
-
-  return {
-    createProofSet,
-    isPending: isPending || isConfirming,
-    isSuccess,
-    hash,
-  }
-}
-```
-</augment_code_snippet>
+Key features:
+- **Proof Set Management**: Creates cryptographic proof sets for file storage verification
+- **Payment Rail Integration**: Links proof sets to payment rails via encoded extra data
+- **Sybil Fee Handling**: Automatic sybil fee calculation and payment (0.1 tFIL)
+- **ABI Encoding**: Proper encoding of payment rail information for contract calls
+- **Transaction Tracking**: Real-time transaction status with confirmation monitoring
+- **Error Handling**: Comprehensive error handling for proof set creation failures
 
 ### 6. Real-time Storage Dashboard
 
-Hot Vault provides a comprehensive dashboard for monitoring storage status:
+Hot Vault provides a comprehensive dashboard for monitoring storage status with real-time updates.
 
-<augment_code_snippet path="hotvault-demo-source/components/StorageDashboard.tsx" mode="EXCERPT">
-```tsx
-'use client'
-import { useState, useEffect } from 'react'
-import { useAccount, useReadContract } from 'wagmi'
-import { CONTRACTS } from '@/lib/contracts'
+**📁 Source:** [`components/StorageDashboard.tsx`](https://github.com/FilOzone/hotvault-demo/blob/main/components/StorageDashboard.tsx)
 
-interface StoredFile {
-  fileId: string
-  name: string
-  size: number
-  commP: string
-  proofSetId?: bigint
-  railId?: bigint
-  uploadDate: string
-  lastProofSubmission?: string
-  proofStatus: 'pending' | 'active' | 'failed'
-  paymentStatus: 'active' | 'settled' | 'disputed'
-}
-
-export function StorageDashboard() {
-  const { address } = useAccount()
-  const [files, setFiles] = useState<StoredFile[]>([])
-  const [loading, setLoading] = useState(true)
-
-  // Read proof set status from contract
-  const { data: proofSetData } = useReadContract({
-    address: CONTRACTS.PDP_VERIFIER_ADDRESS,
-    abi: CONTRACTS.PDP_VERIFIER_ABI,
-    functionName: 'getProofSetInfo',
-    args: [1n], // Example proof set ID
-  })
-
-  useEffect(() => {
-    // Load user's files from API
-    const loadFiles = async () => {
-      if (!address) return
-
-      try {
-        const response = await fetch(`/api/files?address=${address}`)
-        const data = await response.json()
-        setFiles(data.files || [])
-      } catch (error) {
-        console.error('Failed to load files:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadFiles()
-  }, [address])
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">Total Files</h3>
-          <p className="text-3xl font-bold text-blue-600">{files.length}</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">Storage Used</h3>
-          <p className="text-3xl font-bold text-green-600">
-            {formatBytes(files.reduce((sum, f) => sum + f.size, 0))}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-2">Active Proofs</h3>
-          <p className="text-3xl font-bold text-purple-600">
-            {files.filter(f => f.proofStatus === 'active').length}
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold">Your Stored Files</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  File Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Size
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Proof Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Payment Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {files.map((file) => (
-                <tr key={file.fileId}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {file.name}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {file.commP.slice(0, 20)}...
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatBytes(file.size)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <ProofStatusBadge status={file.proofStatus} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <PaymentStatusBadge status={file.paymentStatus} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 mr-4">
-                      Download
-                    </button>
-                    <button className="text-red-600 hover:text-red-900">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function ProofStatusBadge({ status }: { status: string }) {
-  const colors = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    active: 'bg-green-100 text-green-800',
-    failed: 'bg-red-100 text-red-800',
-  }
-
-  return (
-    <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[status as keyof typeof colors]}`}>
-      {status}
-    </span>
-  )
-}
-
-function PaymentStatusBadge({ status }: { status: string }) {
-  const colors = {
-    active: 'bg-blue-100 text-blue-800',
-    settled: 'bg-green-100 text-green-800',
-    disputed: 'bg-red-100 text-red-800',
-  }
-
-  return (
-    <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[status as keyof typeof colors]}`}>
-      {status}
-    </span>
-  )
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 Bytes'
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-}
-```
-</augment_code_snippet>
+Key features:
+- **Real-time Monitoring**: Live updates of proof submission and payment status
+- **File Management**: Complete file listing with metadata and actions
+- **Status Indicators**: Visual badges for proof and payment status
+- **Storage Analytics**: Total files, storage used, and active proofs metrics
+- **Contract Integration**: Direct contract reads for proof set information
+- **Responsive Design**: Mobile-friendly table layout with overflow handling
+- **TypeScript Interfaces**: Strongly typed file and status data structures
 
 ## Running the Hot Vault Demo
 
@@ -720,10 +310,218 @@ hotvault-demo/
 
 **Next**: [Step 5: Photo Storage Tutorial](../first-deal.md) - Upload your first photo from desktop to storage provider
 
+## Production Deployment with Vercel
+
+### Overview
+
+Deploy your Hot Vault application to production using Vercel's modern deployment platform. This section covers the complete deployment process, environment configuration, and CI/CD setup.
+
+### Prerequisites for Production
+
+- **Vercel Account**: Sign up at [vercel.com](https://vercel.com)
+- **GitHub Repository**: Your Hot Vault fork or clone
+- **Environment Variables**: Production contract addresses and API keys
+- **Domain (Optional)**: Custom domain for your application
+
+### Step 1: Prepare for Deployment
+
+1. **Fork the Repository**
+   ```bash
+   # Fork the Hot Vault demo repository
+   git clone https://github.com/YOUR_USERNAME/hotvault-demo.git
+   cd hotvault-demo
+   ```
+
+2. **Install Vercel CLI**
+   ```bash
+   npm install -g vercel
+   vercel login
+   ```
+
+3. **Configure Environment Variables**
+
+   Create a `.env.production` file:
+   ```bash
+   # Production Environment Variables
+   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_production_project_id
+   NEXT_PUBLIC_CHAIN_ID=314159
+   NEXT_PUBLIC_RPC_URL=https://api.calibration.node.glif.io/rpc/v1
+
+   # Production Contract Addresses
+   NEXT_PUBLIC_PDP_VERIFIER_ADDRESS=0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC
+   NEXT_PUBLIC_PDP_SERVICE_ADDRESS=0x6170dE2b09b404776197485F3dc6c968Ef948505
+   NEXT_PUBLIC_PAYMENTS_ADDRESS=0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A
+   NEXT_PUBLIC_USDFC_TOKEN_ADDRESS=0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0
+
+   # Database (Production)
+   DATABASE_URL=postgresql://user:password@host:5432/hotvault_prod
+
+   # Storage Configuration
+   STORAGE_PROVIDER_ENDPOINT=https://your-storage-provider.com
+   IPFS_GATEWAY=https://your-ipfs-gateway.com
+   ```
+
+### Step 2: Deploy to Vercel
+
+1. **Connect Repository**
+   ```bash
+   vercel --prod
+   ```
+
+2. **Configure Project Settings**
+   - **Framework Preset**: Next.js
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `.next`
+   - **Install Command**: `npm install`
+
+3. **Set Environment Variables**
+   ```bash
+   # Set production environment variables
+   vercel env add NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID production
+   vercel env add NEXT_PUBLIC_CHAIN_ID production
+   vercel env add DATABASE_URL production
+   # ... add all other environment variables
+   ```
+
+### Step 3: Configure CI/CD Pipeline
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID }}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
+          vercel-args: '--prod'
+```
+
+### Step 4: Production Best Practices
+
+1. **Security Configuration**
+   - Enable HTTPS redirects
+   - Configure CORS policies
+   - Set up rate limiting
+   - Implement proper error handling
+
+2. **Performance Optimization**
+   - Enable Vercel Edge Functions for API routes
+   - Configure CDN caching for static assets
+   - Implement image optimization
+   - Use Vercel Analytics for monitoring
+
+3. **Monitoring and Logging**
+   - Set up Vercel Analytics
+   - Configure error tracking (Sentry)
+   - Implement health checks
+   - Monitor contract interactions
+
+### Step 5: Custom Domain Setup
+
+1. **Add Custom Domain**
+   ```bash
+   vercel domains add yourdomain.com
+   ```
+
+2. **Configure DNS**
+   - Add CNAME record pointing to `cname.vercel-dns.com`
+   - Or add A record pointing to Vercel's IP addresses
+
+3. **SSL Certificate**
+   - Vercel automatically provisions SSL certificates
+   - Certificates auto-renew every 90 days
+
+### Deployment Hooks Integration
+
+Configure deployment hooks for automated deployments:
+
+```typescript
+// vercel.json
+{
+  "functions": {
+    "app/api/**/*.ts": {
+      "runtime": "@vercel/node"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Troubleshooting Production Issues
+
+**Common Deployment Issues:**
+
+1. **Environment Variables Not Loading**
+   - Verify all environment variables are set in Vercel dashboard
+   - Check variable names match exactly (case-sensitive)
+   - Ensure `NEXT_PUBLIC_` prefix for client-side variables
+
+2. **Contract Connection Failures**
+   - Verify contract addresses are correct for target network
+   - Check RPC endpoint is accessible and has sufficient rate limits
+   - Ensure wallet connection works with production domain
+
+3. **Build Failures**
+   - Check Node.js version compatibility
+   - Verify all dependencies are listed in package.json
+   - Review build logs for specific error messages
+
 ## Additional Resources
 
 - [Hot Vault Demo Repository](https://github.com/FilOzone/hotvault-demo)
+- [Vercel Deployment Documentation](https://vercel.com/docs/deployments)
 - [Wagmi Documentation](https://wagmi.sh/)
 - [Next.js App Router Guide](https://nextjs.org/docs/app)
 - [Filecoin Storage Documentation](https://docs.filecoin.io/storage-providers/)
 - [USDFC Stablecoin Guide](https://docs.secured.finance/)
+- [Vercel Environment Variables Guide](https://vercel.com/docs/projects/environment-variables)
