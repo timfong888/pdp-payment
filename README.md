@@ -75,12 +75,39 @@ The integration between PDP and Payments enables:
 
 ## Getting Started
 
-To get started with PDP-Payments (FWS):
+### 🚀 Choose Your Path to Success
 
-1. Review the [Quick Start Guide](docs/quick-start.md)
-2. Understand the [PDP System](docs/pdp-overview.md) and [Payments System](docs/payments/concepts/overview.md)
-3. Learn how to [Integrate PDP with Payments](docs/integration/pdp-payments.md)
-4. Explore the [Hot Vault Example](docs/examples/hot-vault.md)
+**What do you want to build?**
+
+#### 📱 **Developer Path: Build Apps Fast** (Recommended)
+Use the Synapse SDK for rapid development with integrated PDP + Payments:
+
+**⚡ 5-Minute Hello World**
+1. **[Setup Wallet & USDFC](docs/setup.md)** - Get testnet tokens (shared setup)
+2. **[Quick SDK Setup](docs/sdk-quickstart.md)** - Install and initialize Synapse SDK
+3. **[Complete Workflow](docs/sdk-workflow.md)** - Store file + handle payments in ~20 lines
+4. **[Monitor & Verify](docs/sdk-monitoring.md)** - Track storage proofs and payments
+
+**💡 Why SDK?** Abstract away complexity - automatic payment escrow, built-in settlement, simple balance management.
+
+#### 🤖 **AI Agent Path: Maximum Control** (Advanced)
+Direct contract interactions for full technical control:
+
+**🔧 Technical Deep Dive**
+1. **[Setup Wallet & USDFC](docs/setup.md)** - Get testnet tokens (shared setup)
+2. **[Blockchain Configuration](docs/setup-detailed.md)** - JSON-RPC, Viem patterns, environment setup
+3. **[Contract Integration](docs/contracts-guide.md)** - Direct PDP and Payment contract calls
+4. **[Advanced Patterns](docs/examples/hot-vault.md)** - Production-ready Wagmi v2 + Next.js examples
+
+**🎯 Why Contracts?** Full control over every transaction, custom logic, advanced error handling.
+
+### 📚 Deep Dive Documentation
+
+Once you've completed the Golden Path:
+
+1. Understand the [PDP System](docs/pdp-overview.md) and [Payments System](docs/payments-overview.md)
+2. Learn how to [Integrate PDP with Payments](docs/integration-guide.md)
+3. Explore advanced [Integration Patterns](docs/integration/pdp-payments.md)
 
 ## Contributing
 
