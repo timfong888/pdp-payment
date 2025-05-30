@@ -22,6 +22,8 @@ However, the other repos represent the related primitives:
 2. https://github.com/FilOzone/pdp (`pdp`)
 3. https://github.com/FilOzone/fws-payments (`fws-payments`)
 4. https://github.com/FilOzone/hotvault-demo (`hotvault-demo`)
+5. https://github.com/FilOzone/filecoin-services (`filecoin-services`)
+6. https://github.com/FilOzone/pdp-explorer (`pdp-explorer`)
 
 #### Existing Documentation
 The following are documentation sites that, as needed, you should crawl to help you to build a single documentation site.  
