@@ -9,6 +9,9 @@ If there are aspects of the comment I have provided that are unclear to you and 
 
 Each question have a `[ ]` so that you can show it is considered answered by you after you read my response directly beneath each question.
 
+### Where should the AI Agent go for details on the code?
+There is a repo list `repo_list.md` which should list the read-only repos that likely will need to be referenced with a link.  But also the code snippets and human-readable / AI agent parseable concepts should be extracted from those code bases to make it easy to for an AI agent to get accurate context with an efficient use of tokens.  Or to easily prime context.
+
 ### What should be done with the changes?
 Create a branch and title it `Doc Review [date-time]` using the Date Time used in the header to which the questions were completed.  Create a separate branch for each Date Time header.
 
