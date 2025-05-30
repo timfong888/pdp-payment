@@ -9,6 +9,11 @@ If there are aspects of the comment I have provided that are unclear to you and 
 
 Each question have a `[ ]` so that you can show it is considered answered by you after you read my response directly beneath each question.
 
+### What should be done with the changes?
+Create a branch and title it `Doc Review [date-time]` using the Date Time used in the header to which the questions were completed.  Create a separate branch for each Date Time header.
+
+Create a pull request that will allow a human User to quickly review and then manually merge (or ask you to merge).
+
 ### May 30, 2025 7:30 AM
 
 1. The README Table of Contents should start with `Getting Started` ahead of the Key Components section.
