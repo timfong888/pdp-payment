@@ -108,6 +108,54 @@ interface PDPListener {
 }
 ```
 
+## System Flow Diagram
+
+The following sequence diagram illustrates the complete flow of data and payments through the PDP system, from initial setup through settlement:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant PDPVerifier
+    participant SimplePDPService
+    participant PaymentsContract
+    participant StorageProvider
+
+    Note over Client, StorageProvider: Setup Phase
+    Client->>PaymentsContract: Create payment rail with USDFC deposit
+    PaymentsContract-->>Client: Return railId
+
+    Client->>PDPVerifier: createProofSet(pdpService, extraData[railId, paymentsAddr])
+    PDPVerifier->>SimplePDPService: proofSetCreated(proofSetId, client, extraData)
+    SimplePDPService->>PaymentsContract: Initialize payment escrow for proofSetId
+    PDPVerifier-->>Client: Return proofSetId
+
+    Note over Client, StorageProvider: Data Storage Phase
+    Client->>StorageProvider: Store data (off-chain)
+    StorageProvider->>PDPVerifier: addRoots(proofSetId, dataRoots)
+    PDPVerifier-->>StorageProvider: Confirm roots added
+
+    Note over Client, StorageProvider: Proving Phase (Recurring)
+    loop Every Proving Period (24 hours)
+        PDPVerifier->>PDPVerifier: Generate challenges for proofSetId
+        StorageProvider->>PDPVerifier: provePossession(proofSetId, proofs)
+
+        alt Valid Proof Submitted
+            PDPVerifier->>SimplePDPService: possessionProven(proofSetId, ...)
+            SimplePDPService->>PaymentsContract: Release payment to StorageProvider
+            PaymentsContract-->>StorageProvider: Transfer USDFC payment
+        else Invalid/Missing Proof
+            PDPVerifier->>SimplePDPService: Record fault for proofSetId
+            SimplePDPService->>PaymentsContract: Adjust payment (reduce/withhold)
+        end
+    end
+
+    Note over Client, StorageProvider: Settlement Phase
+    Client->>PaymentsContract: settleRail(railId)
+    PaymentsContract->>PaymentsContract: Calculate final balances
+    PaymentsContract-->>Client: Return remaining USDFC
+    PaymentsContract-->>StorageProvider: Final payment settlement
+```
+
 ## How It Works
 
 ### 1. Creating a Proof Set

@@ -113,18 +113,45 @@ function createRail(
 **Returns:**
 - `railId`: The ID of the newly created payment rail
 
-**Example:**
+**Example: Creating a Storage Payment Rail**
+
+Let's create a payment rail for a typical storage deal scenario:
+
+**Scenario**: A client wants to store 1GB of data for 6 months with a storage provider.
+
+**Real-World Costs & Timing:**
+- **Storage Duration**: 6 months (approximately 180 days)
+- **Total Cost**: $18 USD for 6 months of storage
+- **Monthly Cost**: $3 USD per month
+- **Daily Cost**: $0.10 USD per day
+- **Hourly Cost**: ~$0.004 USD per hour
+
+**How This Translates to Payment Rail Attributes:**
+
 ```javascript
-// Create a payment rail with USDC
+// Create a payment rail with USDFC (Filecoin's USD stablecoin)
 async function createPaymentRail() {
-    const tokenAddress = '0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0'; // USDC on testnet
+    const tokenAddress = '0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0'; // USDFC on testnet
     const clientAddress = wallet.address;
     const providerAddress = '0x...'; // Storage provider address
-    const arbiterAddress = '0x...'; // Arbiter address
-    const paymentRate = ethers.utils.parseUnits('0.01', 6); // 0.01 USDC per epoch
-    const lockupPeriod = 2880; // 1 day in epochs
-    const lockupFixed = ethers.utils.parseUnits('5', 6); // 5 USDC fixed lockup
-    const commissionRate = 250; // 2.5% commission
+    const arbiterAddress = '0x...'; // PDP arbiter for proof verification
+
+    // Payment Rate Calculation:
+    // - Filecoin epoch = 30 seconds
+    // - Daily cost: $0.10 USD = 0.10 USDFC
+    // - Epochs per day: 24 hours × 60 minutes × 2 epochs/minute = 2,880 epochs
+    // - Payment rate: 0.10 USDFC ÷ 2,880 epochs = ~0.0000347 USDFC per epoch
+    const paymentRate = ethers.utils.parseUnits('0.0000347', 6); // ~$0.10 per day
+
+    // Lockup Period:
+    // - 1 day buffer for proof verification = 2,880 epochs
+    const lockupPeriod = 2880; // 1 day in epochs (safety buffer)
+
+    // Fixed Lockup:
+    // - Security deposit equivalent to 1 week of payments = $0.70
+    const lockupFixed = ethers.utils.parseUnits('0.70', 6); // 1 week security deposit
+
+    const commissionRate = 250; // 2.5% commission to platform operator
     
     // First, approve the Payments contract to spend your tokens
     const token = new ethers.Contract(tokenAddress, tokenAbi, wallet);
@@ -175,6 +202,61 @@ async function settlePayments(railId) {
 
 If an arbiter is specified, it will be called to potentially adjust the payment amount based on service performance.
 
+## What is Settlement and How It Occurs
+
+**Settlement** is the process of calculating and transferring the actual payments from the client to the storage provider based on the agreed payment rate and any adjustments made by arbiters.
+
+### How Settlement Works
+
+1. **Continuous Accrual**: Payments accrue continuously at the specified rate (e.g., $0.10 per day)
+2. **Periodic Settlement**: Actual token transfers happen when `settleRail()` is called
+3. **Arbiter Adjustments**: If a PDP arbiter is configured, it can reduce payments based on proof compliance
+4. **Final Transfer**: Tokens are transferred from the client's locked funds to the storage provider
+
+### Settlement Timing
+
+Settlement can occur:
+- **On-Demand**: Anyone can call `settleRail()` to trigger settlement up to the current epoch
+- **Automatically**: Through scheduled calls or when specific events occur (e.g., proof submission)
+- **At Termination**: When a rail is terminated, all outstanding payments are settled
+
+### Settlement Example
+
+```javascript
+// Example: Settlement with PDP compliance checking
+async function settleWithCompliance(railId) {
+    const currentEpoch = await provider.getBlockNumber();
+
+    // When settlement is called, the system:
+    // 1. Calculates total payment owed (rate × time elapsed)
+    // 2. Calls the PDP arbiter to check proof compliance
+    // 3. Arbiter may reduce payment if proofs were missed
+    // 4. Transfers the final amount to storage provider
+
+    await payments.settleRail(railId, currentEpoch);
+
+    console.log('Settlement completed with PDP compliance verification');
+}
+```
+
+### Settlement Scenarios
+
+**Scenario 1: Perfect Compliance**
+- Client owes $3.00 for 30 days of storage
+- Storage provider submitted all required proofs
+- **Result**: Full $3.00 is transferred to storage provider
+
+**Scenario 2: Missed Proofs**
+- Client owes $3.00 for 30 days of storage
+- Storage provider missed proofs for 3 days (10% downtime)
+- PDP arbiter reduces payment by 10%
+- **Result**: $2.70 is transferred to storage provider, $0.30 remains with client
+
+**Scenario 3: Early Termination**
+- Client terminates storage after 15 days
+- Only $1.50 in payments have accrued
+- **Result**: $1.50 is transferred to storage provider, remaining funds returned to client
+
 ### Managing Rails
 
 Rails can be modified and terminated:
@@ -192,6 +274,49 @@ async function modifyRailPayment(railId, newRate) {
 // Terminate the rail
 async function terminateRail(railId) {
     await payments.terminateRail(railId);
+}
+```
+
+## Advanced Features
+
+### Scheduled Rate Changes
+
+Payment rates can be scheduled to change at future epochs, allowing for dynamic pricing models:
+
+```javascript
+// Schedule a rate change for 3 days from now
+async function scheduleRateChange(railId, newRate) {
+    const futureEpoch = await provider.getBlockNumber() + 8640; // 3 days = 8640 epochs
+
+    await payments.scheduleRateChange(
+        railId,
+        futureEpoch,
+        ethers.utils.parseUnits(newRate, 6) // New rate in USDFC
+    );
+
+    console.log(`Rate change scheduled for epoch ${futureEpoch}`);
+}
+```
+
+### Commission Payments
+
+The system supports commission payments to platform operators:
+
+```javascript
+// Create a rail with 5% commission to platform
+async function createRailWithCommission() {
+    const railId = await payments.createRail(
+        tokenAddress,
+        clientAddress,
+        providerAddress,
+        arbiterAddress,
+        paymentRate,
+        lockupPeriod,
+        lockupFixed,
+        500 // 5% commission (500 basis points)
+    );
+
+    return railId;
 }
 ```
 
