@@ -2,7 +2,8 @@
 ### What is this document?
 This document consists of comments I have had regarding the documentation site.
 ### How should the AI Agent treat this?
-You are an experienced developer and technical writer.  After reading each comment, think.  Then update this `doc_reviews.md` document with
+You are an experienced developer and technical writer.  
+After reading each comment, THINK.  Then update this `doc_reviews.md` document with
 checklist directly beneath each question using markdown `[ ]` with a specific task you will take to address the commment.
 
 If there are aspects of the comment I have provided that are unclear to you and that need to be answered, put them in a `questions.md` document.
@@ -10,14 +11,23 @@ If there are aspects of the comment I have provided that are unclear to you and 
 Each question have a `[ ]` so that you can show it is considered answered by you after you read my response directly beneath each question.
 
 ### Where should the AI Agent go for details on the code?
-There is a repo list `repo_list.md` which should list the read-only repos that likely will need to be referenced with a link.  But also the code snippets and human-readable / AI agent parseable concepts should be extracted from those code bases to make it easy to for an AI agent to get accurate context with an efficient use of tokens.  Or to easily prime context.
+There is a repo list `repo_list.md` which should list the read-only repos that likely will need to be referenced with a link.  
+But also the code snippets and human-readable / AI agent parseable concepts should be extracted from those code bases to make it easy to for an AI agent to get accurate context with an efficient use of tokens.
 
 ### What should be done with the changes?
 Create a branch and title it `Doc Review [date-time]` using the Date Time used in the header to which the questions were completed.  Create a separate branch for each Date Time header.
 
 Create a pull request that will allow a human User to quickly review and then manually merge (or ask you to merge).
 
-Add a link to the branch where you made the changes.
+Add a link to the branch at the bottom of each Date-Time Header with questions.
+
+When you revisit this, if you see `[ ]` that remain empty from a prior DateTime Header, commit those changes to the associated branch.
+
+### May 30, 2025, 11:30 AM
+1. `lib/custom_code` doesn't seem relevant.  We might be able to delete this because there's no dart code for this project
+2. `docs/examples/hot-vault.md` does not look correct.  We should just take relevant snippets from the actual repository and link there: https://github.com/FilOzone/hotvault-demo
+3. We *could* create a separate one written by you, the agent, as another exmaple based on hot-vault called Wagmi-Vercel Hot Vault that uses Wagmi and Vercel IF we can actually port it.  Analyze whether we can by using the MCP Servers that link to the documentation.
+4. 
 
 ### May 30, 2025, 10:00 AM PDT
 1. I do not see a link to the SDK repository and to the dedicated documentation .md files in the `pdp-payment` repository.  Here is text I would expect to see the link on at minimum:   ` Use the Synapse SDK for rapid development with integrated PDP + Payments`:
