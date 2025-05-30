@@ -2,13 +2,13 @@
 
 ## Overview
 
-The current FilOz implementation is a **Minimum Viable Product (MVP)** designed as a proof of concept. This document outlines the manual configuration requirements and limitations of the current system, particularly regarding storage provider selection.
+The current implementation is a **Minimum Viable Product (MVP)** designed as a proof of concept. This document outlines the manual configuration requirements and limitations of the current system, particularly regarding storage provider selection.
 
 ## Current Limitations
 
 ### Manual Storage Provider Configuration
 
-**⚠️ Important:** The current MVP does not support dynamic storage provider selection. Storage providers must be manually configured using hardcoded values in environment variables.
+**⚠️ Important:** The current MVP does NOT support dynamic storage provider selection. Storage providers must be manually configured using hardcoded values in environment variables.
 
 ### No Storage Provider Marketplace
 
@@ -20,7 +20,7 @@ The system currently lacks:
 
 ## Required Manual Configuration
 
-To use the current FilOz system, you must manually configure the following values based on your chosen storage provider:
+To use the current FW PDP-Payments system, you must manually configure the following values based on your chosen storage provider:
 
 ### Server Configuration (Hot Vault Demo)
 
@@ -134,7 +134,7 @@ When dynamic provider selection becomes available:
 
 To use the current MVP:
 
-1. **Choose a Storage Provider**: Contact a FilOz-compatible storage provider
+1. **Choose a Storage Provider**: Contact a FilOz-compatible storage provider (note: how do we enable developers to do this?)
 2. **Obtain Configuration Values**: Get the required SERVICE_NAME, SERVICE_URL, and RECORD_KEEPER values
 3. **Configure Your Application**: Set the environment variables as shown above
 4. **Deploy and Test**: Deploy your application with the hardcoded provider configuration
