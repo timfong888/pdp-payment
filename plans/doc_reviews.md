@@ -21,15 +21,80 @@ Add a link to the branch where you made the changes.
 
 ### May 30, 2025, 10:00 AM PDT
 1. I do not see a link to the SDK repository and to the dedicated documentation .md files in the `pdp-payment` repository.  Here is text I would expect to see the link on at minimum:   ` Use the Synapse SDK for rapid development with integrated PDP + Payments`:
+   - [ ] Examine the current text "Use the Synapse SDK for rapid development with integrated PDP + Payments" in README.md
+   - [ ] Add a direct link to the SDK repository (https://github.com/FilOzone/synapse-sdk) in this text
+   - [ ] Add links to dedicated SDK documentation files within the pdp-payment repository
+   - [ ] Verify all SDK-related links are working and properly formatted
+
 2. Under the Table of Contents Header https://github.com/timfong888/pdp-payment?tab=readme-ov-file#table-of-contents there is no link to the section on the `Synapse SDK` section.
+   - [ ] Add "Synapse SDK" entry to the Table of Contents in README.md
+   - [ ] Ensure the link points to the correct #synapse-sdk anchor
+   - [ ] Verify the Table of Contents ordering is logical and consistent
+
 3. Under the Table of Contents, remove references to Contribution and License across all the pages.
+   - [ ] Remove "Contributing" entry from README.md Table of Contents
+   - [ ] Remove "License" entry from README.md Table of Contents
+   - [ ] Check other documentation pages for similar Table of Contents and remove Contributing/License references
+   - [ ] Verify no broken internal links result from these removals
+
 4. In the `pdp` folder, there are a bunch of files labelled `sdk-*`, thee should be moved into their own dedicated folder `sdk`.
+   - [ ] Identify all files in docs/ with `sdk-*` naming pattern
+   - [ ] Create new `docs/sdk/` folder
+   - [ ] Move all sdk-* files to the new sdk folder
+   - [ ] Update all internal links that reference the moved files
+   - [ ] Update README.md links to point to new sdk folder locations
+   - [ ] Verify no broken links remain after the move
+
 5. in the `pdp/concepts` folder, it's confusing to have an `overview.md` file and another in `/docs` called 'pdp-overview'.  Perhaps these can be merged.  If you do so, MAKE SURE there are no orphaned links as a result of this change.
+   - [ ] Examine content of `docs/pdp/concepts/overview.md`
+   - [ ] Examine content of `docs/pdp-overview.md`
+   - [ ] Compare the two files to identify unique content in each
+   - [ ] Merge unique content from pdp/concepts/overview.md into pdp-overview.md
+   - [ ] Search entire repository for links to `pdp/concepts/overview.md`
+   - [ ] Update all found links to point to `pdp-overview.md`
+   - [ ] Remove the redundant `docs/pdp/concepts/overview.md` file
+   - [ ] Verify all links work correctly after the merge
+
 6. Under `payments/concepts` there are three files with `payment-rails` in the title.  Can you clarify their role and perhaps break it down into a single document that is both comprehensive and concise.  MAKE SURE there are no orphaned links resulting from this refactoring.
+   - [ ] Examine content of `docs/payments/concepts/payment-rails.md`
+   - [ ] Examine content of `docs/payments/concepts/payment-rails-new.md`
+   - [ ] Examine content of `docs/payments/concepts/payment-rails-updated.md`
+   - [ ] Analyze the differences and determine the most current/comprehensive version
+   - [ ] Create a single consolidated payment-rails.md document with comprehensive content
+   - [ ] Search repository for all links to the three separate payment-rails files
+   - [ ] Update all links to point to the consolidated document
+   - [ ] Remove the redundant payment-rails files
+   - [ ] Document the consolidation decision and rationale
+
 7. The folder `payments/api` is confusing a little bit to me when the file name is `payments-contract.md`.  Could we change the name of the folder to `contracts`?  Or is there a reason API is used?
+   - [ ] Examine the content of `docs/payments/api/payments-contract.md`
+   - [ ] Determine if the content is about contracts or API endpoints
+   - [ ] Rename `docs/payments/api/` folder to `docs/payments/contracts/` if content is contract-focused
+   - [ ] Update all internal links that reference the old folder path
+   - [ ] Update README.md and other documentation references
+   - [ ] Verify the new folder name better reflects the content purpose
+
 8. https://github.com/timfong888/pdp-payment/blob/main/docs/MVP.md#client-configuration lists terms which I don't understand.  Are they explained in repositories listed in `repo_list.md`?  Specifically: Payment proxy address (who is the recipient, who sets it up?), PDP Service address (is that the contract address that is listed for the PDP Service Contract?  I am guessing that NONE OF THESE ARE USER DEFINED.  But it would be helpful to a) have a human-readable definition; b) reference links to how these addresses are used (could be in another doc called `contracts details`.
+   - [ ] Create a new document `docs/contracts-details.md` with human-readable definitions
+   - [ ] Define "Payment proxy address" - explain who the recipient is and who sets it up
+   - [ ] Define "PDP Service address" - clarify if this is the contract address for PDP Service Contract
+   - [ ] Clarify which addresses are user-defined vs system-defined
+   - [ ] Add cross-references to relevant repositories in repo_list.md for deeper technical details
+   - [ ] Update MVP.md to link to the new contracts-details.md document
+   - [ ] Ensure definitions are accessible to both developers and AI agents
+
 9. You already have good definitions under `Configuration Requirements` which I believe are for the server.
+   - [ ] Review the Configuration Requirements section in MVP.md
+   - [ ] Clarify that these are server-side configuration requirements
+   - [ ] Add a clear distinction between server and client configuration sections
+   - [ ] Ensure the section headers clearly indicate server vs client scope
+
 10. https://github.com/timfong888/pdp-payment/blob/main/docs/MVP.md#server-configuration-hot-vault-demo references PDPTool but no link out as to what it is.  I think the docs for PDP Tool should be referenced; or an internal doc explaining what it is, and it's repo (which is in the curio organization).
+    - [ ] Research PDPTool in the curio organization repositories
+    - [ ] Create internal documentation explaining what PDPTool is and its purpose
+    - [ ] Add link to PDPTool repository in the curio organization
+    - [ ] Update MVP.md to include proper PDPTool documentation links
+    - [ ] Ensure developers understand PDPTool's role in the system
 
 
 ### May 30, 2025 7:30 AM
