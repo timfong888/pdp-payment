@@ -7,6 +7,8 @@
     "dagparts": "https://github.com/FilOzone/dagparts.git",
     "payments": "https://github.com/FilOzone/payments.git",
     "fil-forwarder-frontend": "https://github.com/FilOzone/fil-forwarder-frontend.git",
-    "FilForwarder": "https://github.com/FilOzone/FilForwarder.git"
+    "FilForwarder": "https://github.com/FilOzone/FilForwarder.git",
+    "Filecoin Services": "https://github.com/FilOzone/filecoin-services",
+    "HotVault Demo": "https://github.com/FilOzone/hotvault-demo"
   }
 }
