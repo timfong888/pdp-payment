@@ -34,7 +34,10 @@ SERVICE_URL=https://your-service-url.com
 RECORD_KEEPER=0xYourRecordKeeperAddress
 ```
 
-> **📖 What is PDPTool?** PDPTool is a command-line client tool bundled with [Curio](https://github.com/filecoin-project/curio) that enables interaction with Filecoin Storage Providers running the Proof of Data Possession (PDP) service. It allows clients to create proof sets, upload files, add file roots, and verify storage integrity. For detailed setup and usage instructions, see the [official Filecoin PDP documentation](https://docs.filecoin.io/storage-providers/pdp/use-pdp).
+> **📖 What is PDPTool?** PDPTool is a command-line client tool bundled with [Curio](https://github.com/filecoin-project/curio) that enables interaction with Filecoin Storage Providers running the Proof of Data Possession (PDP) service. It allows clients to create proof sets, upload files, add file roots, and verify storage integrity. For detailed setup and usage instructions, see:
+> - [Curio PDP Setup Documentation](https://docs.curiostorage.org/experimental-features/enable-pdp#pdp-client)
+> - [Official Filecoin PDP Documentation](https://docs.filecoin.io/storage-providers/pdp/use-pdp)
+> - [Curio Repository](https://github.com/filecoin-project/curio)
 
 ### Calibnet Test Configuration
 

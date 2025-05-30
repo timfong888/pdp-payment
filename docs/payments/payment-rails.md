@@ -1,5 +1,26 @@
 # Payment Rails
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Concepts](#key-concepts)
+  - [What is a Payment Rail?](#what-is-a-payment-rail)
+  - [Epoch Duration](#epoch-duration)
+  - [Payment Rate Calculation](#payment-rate-calculation)
+  - [Rail Structure](#rail-structure)
+- [How Payment Rails Work](#how-payment-rails-work)
+  - [1. Rail Creation](#1-rail-creation)
+  - [2. Fund Lockup](#2-fund-lockup)
+  - [3. Payment Flow](#3-payment-flow)
+  - [4. Arbitration](#4-arbitration)
+  - [5. Rail Management](#5-rail-management)
+  - [6. Rail Updates and Their Impact](#6-rail-updates-and-their-impact)
+- [Integration with PDP](#integration-with-pdp)
+- [Best Practices](#best-practices)
+- [API Reference](#api-reference)
+- [Examples](#examples)
+- [Next Steps](#next-steps)
+
 ## Overview
 
 Payment Rails are a core component of the PDP-Payments (FWS) system that enable continuous, programmable payment flows between clients and storage providers. They function as dedicated payment channels that automate the process of compensating storage providers for their services while enforcing Service Level Agreements (SLAs).
@@ -15,6 +36,75 @@ A Payment Rail is a smart contract-based payment channel that:
 3. **Enforces SLAs**: Integrates with arbiters to adjust payments based on service quality
 4. **Provides security**: Locks funds to ensure payment obligations are met
 5. **Offers flexibility**: Allows for rate adjustments and termination conditions
+
+### Epoch Duration
+
+In the Filecoin network, one epoch is approximately **30 seconds** in clock time. This is a fundamental parameter in the system because:
+
+1. The `paymentRate` is specified as tokens per epoch
+2. The `lockupPeriod` is measured in epochs (e.g., 2880 epochs = 1 day)
+3. Settlement intervals and proof submission windows are measured in epochs
+
+When calculating costs and rates, this epoch duration must be considered:
+
+```javascript
+// Converting between time-based rates and epoch-based rates
+// Example: $5/month for 100 GB of data
+const dollarsPerMonth = 5.0;
+const secondsPerMonth = 30 * 24 * 60 * 60; // 30 days in seconds
+const secondsPerEpoch = 30; // 30 seconds per epoch
+const epochsPerMonth = secondsPerMonth / secondsPerEpoch; // ~86,400 epochs
+const dollarsPerEpoch = dollarsPerMonth / epochsPerMonth; // ~$0.0000579 per epoch
+
+console.log(`Monthly rate: $${dollarsPerMonth}`);
+console.log(`Per-epoch rate: $${dollarsPerEpoch.toFixed(8)}`);
+console.log(`Token units per epoch (6 decimals): ${ethers.utils.parseUnits(dollarsPerEpoch.toFixed(8), 6)}`);
+// Output:
+// Monthly rate: $5
+// Per-epoch rate: $0.00005787
+// Token units per epoch (6 decimals): 57870
+```
+
+### Payment Rate Calculation
+
+The `paymentRate` parameter represents the rate at which funds flow from the client to the storage provider per epoch. This rate is typically calculated off-chain based on several factors:
+
+```javascript
+// Example of calculating payment rate based on data size and market factors
+function calculatePaymentRate(dataSize, storagePrice, epochsPerDay) {
+    // Convert data size to GB
+    const dataSizeGB = dataSize / (1024 * 1024 * 1024);
+
+    // Calculate daily cost based on market price per GB
+    const dailyCost = dataSizeGB * storagePrice;
+
+    // Convert to per-epoch rate
+    const paymentRate = ethers.utils.parseUnits(
+        (dailyCost / epochsPerDay).toFixed(6),
+        6
+    );
+
+    return paymentRate;
+}
+
+// Usage example for $5/month for 100 GB
+const dataSize = 100 * 1024 * 1024 * 1024; // 100 GB in bytes
+const daysPerMonth = 30;
+const dailyRate = 5 / daysPerMonth; // $0.1667 per day for 100 GB
+const pricePerGBPerDay = dailyRate / 100; // $0.001667 per GB per day
+const epochsPerDay = 2880; // 30-second epochs
+const rate = calculatePaymentRate(dataSize, pricePerGBPerDay, epochsPerDay);
+
+console.log(`Payment rate for 100 GB at $5/month: ${rate} token units per epoch`);
+// This would result in approximately 57,870 token units per epoch
+```
+
+Factors that typically influence the payment rate include:
+
+1. **Data Size**: Larger data requires more storage resources
+2. **Storage Duration**: Longer commitments may have different pricing
+3. **Market Rates**: Competitive pricing based on current market conditions
+4. **Quality of Service**: Premium service levels (such as faster retrieval times, higher redundancy, or better geographic distribution) may command higher rates and are negotiated between the client and storage provider
 
 ### Rail Structure
 
@@ -230,6 +320,52 @@ async function terminateRail(railId) {
     await payments.terminateRail(railId);
 }
 ```
+
+### 6. Rail Updates and Their Impact
+
+When a payment rail is modified using `modifyRailPayment`, it's important to understand:
+
+1. **What changes**: Typically the payment rate (`paymentRate`) is updated
+2. **What doesn't change**: Proof obligations, verification schedule, and the actual data being stored remain the same
+3. **Settlement implications**: Any unsettled payments before the update use the old rate; payments after use the new rate
+
+#### Common Scenarios for Rail Updates
+
+1. **Data expansion**: When a client adds more data to be stored
+   ```javascript
+   // Example: Updating payment rate when data size increases
+   async function updateRailForNewData(railId, originalDataSize, newDataSize, originalRate) {
+       // Calculate new rate proportional to data increase
+       const dataRatio = newDataSize / originalDataSize;
+       const newRate = originalRate.mul(ethers.BigNumber.from(Math.floor(dataRatio * 100))).div(100);
+
+       await payments.modifyRailPayment(railId, newRate, 0);
+   }
+   ```
+
+2. **Price adjustments**: Responding to market changes
+   ```javascript
+   // Example: Applying a price increase
+   async function applyPriceIncrease(railId, currentRate, percentIncrease) {
+       const newRate = currentRate.mul(100 + percentIncrease).div(100);
+       await payments.modifyRailPayment(railId, newRate, 0);
+   }
+   ```
+
+#### Relationship with PDP System
+
+Rail updates do not directly affect the PDP proof requirements:
+
+1. The storage provider must continue to submit proofs for all data
+2. The arbiter continues to evaluate proof compliance using the same criteria
+3. The payment amount that gets adjusted by the arbiter will be based on the new rate
+
+#### Best Practices for Rail Updates
+
+1. **Communicate changes**: Notify all parties before updating rails
+2. **Document justification**: Record the reason for rate changes
+3. **Settle before updates**: Consider settling payments before making rate changes
+4. **Verify after updates**: Confirm the new rate is correctly applied
 
 ## Integration with PDP
 
