@@ -21,81 +21,94 @@ Add a link to the branch where you made the changes.
 
 ### May 30, 2025, 10:00 AM PDT
 1. I do not see a link to the SDK repository and to the dedicated documentation .md files in the `pdp-payment` repository.  Here is text I would expect to see the link on at minimum:   ` Use the Synapse SDK for rapid development with integrated PDP + Payments`:
-   - [ ] Examine the current text "Use the Synapse SDK for rapid development with integrated PDP + Payments" in README.md
-   - [ ] Add a direct link to the SDK repository (https://github.com/FilOzone/synapse-sdk) in this text
-   - [ ] Add links to dedicated SDK documentation files within the pdp-payment repository
-   - [ ] Verify all SDK-related links are working and properly formatted
+   - [x] Examine the current text "Use the Synapse SDK for rapid development with integrated PDP + Payments" in README.md
+   - [x] Add a direct link to the SDK repository (https://github.com/FilOzone/synapse-sdk) in this text
+   - [x] Add links to dedicated SDK documentation files within the pdp-payment repository
+   - [x] Verify all SDK-related links are working and properly formatted
 
 2. Under the Table of Contents Header https://github.com/timfong888/pdp-payment?tab=readme-ov-file#table-of-contents there is no link to the section on the `Synapse SDK` section.
-   - [ ] Add "Synapse SDK" entry to the Table of Contents in README.md
-   - [ ] Ensure the link points to the correct #synapse-sdk anchor
-   - [ ] Verify the Table of Contents ordering is logical and consistent
+   - [x] Add "Synapse SDK" entry to the Table of Contents in README.md
+   - [x] Ensure the link points to the correct #synapse-sdk anchor
+   - [x] Verify the Table of Contents ordering is logical and consistent
 
 3. Under the Table of Contents, remove references to Contribution and License across all the pages.
-   - [ ] Remove "Contributing" entry from README.md Table of Contents
-   - [ ] Remove "License" entry from README.md Table of Contents
-   - [ ] Check other documentation pages for similar Table of Contents and remove Contributing/License references
-   - [ ] Verify no broken internal links result from these removals
+   - [x] Remove "Contributing" entry from README.md Table of Contents
+   - [x] Remove "License" entry from README.md Table of Contents
+   - [x] Check other documentation pages for similar Table of Contents and remove Contributing/License references
+   - [x] Verify no broken internal links result from these removals
 
 4. In the `pdp` folder, there are a bunch of files labelled `sdk-*`, thee should be moved into their own dedicated folder `sdk`.
-   - [ ] Identify all files in docs/ with `sdk-*` naming pattern
-   - [ ] Create new `docs/sdk/` folder
-   - [ ] Move all sdk-* files to the new sdk folder
-   - [ ] Update all internal links that reference the moved files
-   - [ ] Update README.md links to point to new sdk folder locations
-   - [ ] Verify no broken links remain after the move
+   - [x] Identify all files in docs/ with `sdk-*` naming pattern
+   - [x] Create new `docs/sdk/` folder
+   - [x] Move all sdk-* files to the new sdk folder
+   - [x] Update all internal links that reference the moved files
+   - [x] Update README.md links to point to new sdk folder locations
+   - [x] Verify no broken links remain after the move
 
 5. in the `pdp/concepts` folder, it's confusing to have an `overview.md` file and another in `/docs` called 'pdp-overview'.  Perhaps these can be merged.  If you do so, MAKE SURE there are no orphaned links as a result of this change.
-   - [ ] Examine content of `docs/pdp/concepts/overview.md`
-   - [ ] Examine content of `docs/pdp-overview.md`
-   - [ ] Compare the two files to identify unique content in each
-   - [ ] Merge unique content from pdp/concepts/overview.md into pdp-overview.md
-   - [ ] Search entire repository for links to `pdp/concepts/overview.md`
-   - [ ] Update all found links to point to `pdp-overview.md`
-   - [ ] Remove the redundant `docs/pdp/concepts/overview.md` file
-   - [ ] Verify all links work correctly after the merge
+   - [x] Examine content of `docs/pdp/concepts/overview.md`
+   - [x] Examine content of `docs/pdp-overview.md`
+   - [x] Compare the two files to identify unique content in each
+   - [x] Merge unique content from pdp/concepts/overview.md into pdp-overview.md
+   - [x] Search entire repository for links to `pdp/concepts/overview.md`
+   - [x] Update all found links to point to `pdp-overview.md`
+   - [x] Remove the redundant `docs/pdp/concepts/overview.md` file
+   - [x] Verify all links work correctly after the merge
 
 6. Under `payments/concepts` there are three files with `payment-rails` in the title.  Can you clarify their role and perhaps break it down into a single document that is both comprehensive and concise.  MAKE SURE there are no orphaned links resulting from this refactoring.
-   - [ ] Examine content of `docs/payments/concepts/payment-rails.md`
-   - [ ] Examine content of `docs/payments/concepts/payment-rails-new.md`
-   - [ ] Examine content of `docs/payments/concepts/payment-rails-updated.md`
-   - [ ] Analyze the differences and determine the most current/comprehensive version
-   - [ ] Create a single consolidated payment-rails.md document with comprehensive content
-   - [ ] Search repository for all links to the three separate payment-rails files
-   - [ ] Update all links to point to the consolidated document
-   - [ ] Remove the redundant payment-rails files
-   - [ ] Document the consolidation decision and rationale
+   - [x] Examine content of `docs/payments/concepts/payment-rails.md`
+   - [x] Examine content of `docs/payments/concepts/payment-rails-new.md`
+   - [x] Examine content of `docs/payments/concepts/payment-rails-updated.md`
+   - [x] Analyze the differences and determine the most current/comprehensive version
+   - [x] Create a single consolidated payment-rails.md document with comprehensive content
+   - [x] Search repository for all links to the three separate payment-rails files
+   - [x] Update all links to point to the consolidated document
+   - [x] Remove the redundant payment-rails files
+   - [x] Document the consolidation decision and rationale
 
 7. The folder `payments/api` is confusing a little bit to me when the file name is `payments-contract.md`.  Could we change the name of the folder to `contracts`?  Or is there a reason API is used?
-   - [ ] Examine the content of `docs/payments/api/payments-contract.md`
-   - [ ] Determine if the content is about contracts or API endpoints
-   - [ ] Rename `docs/payments/api/` folder to `docs/payments/contracts/` if content is contract-focused
-   - [ ] Update all internal links that reference the old folder path
-   - [ ] Update README.md and other documentation references
-   - [ ] Verify the new folder name better reflects the content purpose
+   - [x] Examine the content of `docs/payments/api/payments-contract.md`
+   - [x] Determine if the content is about contracts or API endpoints
+   - [x] Rename `docs/payments/api/` folder to `docs/payments/contracts/` if content is contract-focused
+   - [x] Update all internal links that reference the old folder path
+   - [x] Update README.md and other documentation references
+   - [x] Verify the new folder name better reflects the content purpose
 
 8. https://github.com/timfong888/pdp-payment/blob/main/docs/MVP.md#client-configuration lists terms which I don't understand.  Are they explained in repositories listed in `repo_list.md`?  Specifically: Payment proxy address (who is the recipient, who sets it up?), PDP Service address (is that the contract address that is listed for the PDP Service Contract?  I am guessing that NONE OF THESE ARE USER DEFINED.  But it would be helpful to a) have a human-readable definition; b) reference links to how these addresses are used (could be in another doc called `contracts details`.
-   - [ ] Create a new document `docs/contracts-details.md` with human-readable definitions
-   - [ ] Define "Payment proxy address" - explain who the recipient is and who sets it up
-   - [ ] Define "PDP Service address" - clarify if this is the contract address for PDP Service Contract
-   - [ ] Clarify which addresses are user-defined vs system-defined
-   - [ ] Add cross-references to relevant repositories in repo_list.md for deeper technical details
-   - [ ] Update MVP.md to link to the new contracts-details.md document
-   - [ ] Ensure definitions are accessible to both developers and AI agents
+   - [x] Create a new document `docs/contracts-details.md` with human-readable definitions
+   - [x] Define "Payment proxy address" - explain who the recipient is and who sets it up
+   - [x] Define "PDP Service address" - clarify if this is the contract address for PDP Service Contract
+   - [x] Clarify which addresses are user-defined vs system-defined
+   - [x] Add cross-references to relevant repositories in repo_list.md for deeper technical details
+   - [x] Update MVP.md to link to the new contracts-details.md document
+   - [x] Ensure definitions are accessible to both developers and AI agents
 
 9. You already have good definitions under `Configuration Requirements` which I believe are for the server.
-   - [ ] Review the Configuration Requirements section in MVP.md
-   - [ ] Clarify that these are server-side configuration requirements
-   - [ ] Add a clear distinction between server and client configuration sections
-   - [ ] Ensure the section headers clearly indicate server vs client scope
+   - [x] Review the Configuration Requirements section in MVP.md
+   - [x] Clarify that these are server-side configuration requirements
+   - [x] Add a clear distinction between server and client configuration sections
+   - [x] Ensure the section headers clearly indicate server vs client scope
 
 10. https://github.com/timfong888/pdp-payment/blob/main/docs/MVP.md#server-configuration-hot-vault-demo references PDPTool but no link out as to what it is.  I think the docs for PDP Tool should be referenced; or an internal doc explaining what it is, and it's repo (which is in the curio organization).
-    - [ ] Research PDPTool in the curio organization repositories
-    - [ ] Create internal documentation explaining what PDPTool is and its purpose
-    - [ ] Add link to PDPTool repository in the curio organization
-    - [ ] Update MVP.md to include proper PDPTool documentation links
-    - [ ] Ensure developers understand PDPTool's role in the system
+    - [x] Research PDPTool in the curio organization repositories
+    - [x] Create internal documentation explaining what PDPTool is and its purpose
+    - [x] Add link to PDPTool repository in the curio organization
+    - [x] Update MVP.md to include proper PDPTool documentation links
+    - [x] Ensure developers understand PDPTool's role in the system
 
+**✅ All 10 items completed successfully!**
+
+**Branch:** `doc-review-may-30-2025-10-00-am-pdt`
+
+**Summary of Changes:**
+- Added SDK repository links and improved SDK documentation organization
+- Updated Table of Contents and removed Contributing/License references
+- Reorganized SDK files into dedicated `docs/sdk/` folder
+- Merged redundant PDP overview files and consolidated payment-rails documentation
+- Renamed `payments/api` to `payments/contracts` for clarity
+- Created comprehensive `contracts-details.md` with human-readable contract explanations
+- Added PDPTool documentation and links to official Filecoin docs
+- Clarified server vs client configuration sections
 
 ### May 30, 2025 7:30 AM
 
