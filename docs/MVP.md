@@ -56,7 +56,7 @@ export const PAYMENT_PROXY_ADDRESS = "0x0E690D3e60B0576D01352AB03b258115eb84A047
 export const PDP_SERVICE_ADDRESS = "0xdbE4bEF3F313dAC36257b0621e4a3BC8Dc9679a1";
 ```
 
-## Configuration Requirements
+## Server Configuration Requirements
 
 ### 1. Service Registration
 
