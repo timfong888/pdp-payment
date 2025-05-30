@@ -27,6 +27,10 @@ Add a link to the branch where you made the changes.
 5. in the `pdp/concepts` folder, it's confusing to have an `overview.md` file and another in `/docs` called 'pdp-overview'.  Perhaps these can be merged.  If you do so, MAKE SURE there are no orphaned links as a result of this change.
 6. Under `payments/concepts` there are three files with `payment-rails` in the title.  Can you clarify their role and perhaps break it down into a single document that is both comprehensive and concise.  MAKE SURE there are no orphaned links resulting from this refactoring.
 7. The folder `payments/api` is confusing a little bit to me when the file name is `payments-contract.md`.  Could we change the name of the folder to `contracts`?  Or is there a reason API is used?
+8. https://github.com/timfong888/pdp-payment/blob/main/docs/MVP.md#client-configuration lists terms which I don't understand.  Are they explained in repositories listed in `repo_list.md`?  Specifically: Payment proxy address (who is the recipient, who sets it up?), PDP Service address (is that the contract address that is listed for the PDP Service Contract?  I am guessing that NONE OF THESE ARE USER DEFINED.  But it would be helpful to a) have a human-readable definition; b) reference links to how these addresses are used (could be in another doc called `contracts details`.
+9. You already have good definitions under `Configuration Requirements` which I believe are for the server.
+10. https://github.com/timfong888/pdp-payment/blob/main/docs/MVP.md#server-configuration-hot-vault-demo references PDPTool but no link out as to what it is.  I think the docs for PDP Tool should be referenced; or an internal doc explaining what it is, and it's repo (which is in the curio organization).
+
 
 ### May 30, 2025 7:30 AM
 
