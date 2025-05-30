@@ -66,7 +66,7 @@ Local Server:
 }
 ```
 
-The relevant docs via MCP:
+The relevant docs via MCP for hehlping a developer build an end-to-end dApp:
 
 - Wagmi (for interacting with smart contracts): https://github.com/wevm/wagmi
 - Solidity (for writing custom EVM smart contracts): https://context7.com/ethereum/solidity
