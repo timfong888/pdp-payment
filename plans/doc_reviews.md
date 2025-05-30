@@ -17,6 +17,17 @@ Create a branch and title it `Doc Review [date-time]` using the Date Time used i
 
 Create a pull request that will allow a human User to quickly review and then manually merge (or ask you to merge).
 
+Add a link to the branch where you made the changes.
+
+### May 30, 2025, 10:00 AM PDT
+1. I do not see a link to the SDK repository and to the dedicated documentation .md files in the `pdp-payment` repository.  Here is text I would expect to see the link on at minimum:   ` Use the Synapse SDK for rapid development with integrated PDP + Payments`:
+2. Under the Table of Contents Header https://github.com/timfong888/pdp-payment?tab=readme-ov-file#table-of-contents there is no link to the section on the `Synapse SDK` section.
+3. Under the Table of Contents, remove references to Contribution and License across all the pages.
+4. In the `pdp` folder, there are a bunch of files labelled `sdk-*`, thee should be moved into their own dedicated folder `sdk`.
+5. in the `pdp/concepts` folder, it's confusing to have an `overview.md` file and another in `/docs` called 'pdp-overview'.  Perhaps these can be merged.  If you do so, MAKE SURE there are no orphaned links as a result of this change.
+6. Under `payments/concepts` there are three files with `payment-rails` in the title.  Can you clarify their role and perhaps break it down into a single document that is both comprehensive and concise.  MAKE SURE there are no orphaned links resulting from this refactoring.
+7. The folder `payments/api` is confusing a little bit to me when the file name is `payments-contract.md`.  Could we change the name of the folder to `contracts`?  Or is there a reason API is used?
+
 ### May 30, 2025 7:30 AM
 
 1. The README Table of Contents should start with `Getting Started` ahead of the Key Components section.
