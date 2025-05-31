@@ -163,3 +163,48 @@ When you revisit this, if you see `[ ]` that remain empty from a prior DateTime 
    - [x] Move any unique/valuable content from payments/concepts/overview.md to payments-overview.md
    - [x] Remove all `<<<<<HEAD` merge conflict markers
    - [x] Remove payments/concepts/overview.md file after content migration
+
+### May 30, 2025, 12:00 PM
+1. The README.md references `docs/contracts-guide.md` on line 48, but this file doesn't exist. This creates a broken link in the documentation.
+   - [x] Create `docs/contracts-guide.md` with comprehensive contract integration guide
+   - [x] Include direct contract interaction patterns for advanced users
+   - [x] Add examples of PDP and Payment contract calls
+   - [x] Include error handling and best practices
+   - [x] Link to relevant contract ABIs and addresses
+
+2. The README.md still contains "Contributing" and "License" sections at the bottom (lines 150-156), but the Table of Contents correctly excludes them. This creates inconsistency.
+   - [x] Remove the "Contributing" section from the bottom of README.md
+   - [x] Remove the "License" section from the bottom of README.md
+   - [x] Ensure the README ends with the "Deployed Contracts" section
+   - [x] Verify no other references to contributing/license remain
+
+3. The `wagmi-vercel-hotvault.md` file created in the previous branch should be merged into main and referenced in the documentation.
+   - [x] Merge the wagmi-vercel-hotvault.md file from the previous branch
+   - [x] Add reference to the new Wagmi-Vercel guide in README.md
+   - [x] Update the examples section to include both traditional and modern approaches
+   - [x] Ensure proper cross-linking between hot-vault.md and wagmi-vercel-hotvault.md
+
+4. The documentation structure could benefit from a comprehensive index or navigation guide to help users find information quickly.
+   - [x] Create `docs/navigation.md` with a comprehensive documentation index
+   - [x] Organize documentation by user type (beginner, intermediate, advanced)
+   - [x] Include quick reference sections for common tasks
+   - [x] Add search-friendly keywords and tags
+
+5. The contract addresses in the README should be verified and potentially moved to a dedicated contracts reference page.
+   - [x] Verify all contract addresses are current and correct
+   - [x] Create `docs/contracts-reference.md` with detailed contract information
+   - [x] Include contract ABIs, deployment information, and usage examples
+   - [x] Update README to reference the new contracts reference page
+   - [x] Add network-specific configuration examples
+
+**✅ All 5 items completed successfully!**
+
+**Branch:** `doc-review-may-30-2025-12-00-pm`
+
+**Summary of Changes:**
+- Created comprehensive `docs/contracts-guide.md` with direct contract integration patterns
+- Removed Contributing and License sections from README.md for consistency
+- Merged `wagmi-vercel-hotvault.md` from previous branch with proper cross-references
+- Created `docs/navigation.md` as a comprehensive documentation index
+- Created `docs/contracts-reference.md` with complete contract information and updated README references
+- Enhanced documentation organization and discoverability
