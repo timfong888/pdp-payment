@@ -4,6 +4,9 @@ This is the fourth step in your Golden Path. You'll explore the Hot Vault demo -
 
 **🔗 Live Demo Repository:** [https://github.com/FilOzone/hotvault-demo](https://github.com/FilOzone/hotvault-demo)
 
+
+> **💡 Looking for a modern serverless approach?** Check out the [Wagmi-Vercel Hot Vault Guide](wagmi-vercel-hotvault.md) for a Docker-free, serverless implementation using Wagmi v2 and Vercel deployment.
+
 ## Prerequisites
 
 - ✅ Completed [Step 1: Setup Wallet & USDFC](../setup.md)

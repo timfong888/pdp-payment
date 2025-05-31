@@ -4,6 +4,9 @@ This guide shows how to build a modern Hot Vault application using **Wagmi v2** 
 
 **🔗 Reference Implementation:** [Original Hot Vault Demo](https://github.com/FilOzone/hotvault-demo)
 
+
+> **📚 Comparing approaches?** See the [Traditional Hot Vault Guide](hot-vault.md) for the Docker-based reference implementation with detailed explanations of the core concepts.
+
 ## Why Wagmi + Vercel?
 
 ### Advantages Over Original Architecture

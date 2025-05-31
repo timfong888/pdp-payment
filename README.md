@@ -46,7 +46,9 @@ Direct contract interactions for full technical control:
 1. **[Setup Wallet & USDFC](docs/setup.md)** - Get testnet tokens (shared setup)
 2. **[Blockchain Configuration](docs/setup-detailed.md)** - JSON-RPC, Viem patterns, environment setup
 3. **[Contract Integration](docs/contracts-guide.md)** - Direct PDP and Payment contract calls
-4. **[Advanced Patterns](docs/examples/hot-vault.md)** - Production-ready Wagmi v2 + Next.js examples
+4. **[Advanced Patterns](docs/examples/hot-vault.md)** - Production-ready examples
+   - **[Traditional Hot Vault](docs/examples/hot-vault.md)** - Reference implementation with Docker
+   - **[Modern Wagmi-Vercel Hot Vault](docs/examples/wagmi-vercel-hotvault.md)** - Serverless Web3 app with Wagmi v2
 
 **🎯 Why Contracts?** Full control over every transaction, custom logic, advanced error handling.
 
@@ -131,26 +133,22 @@ The integration between PDP and Payments enables:
 - [Payment Rails](docs/payments/payment-rails.md): Documentation on payment rails
 - [Integration Guide](docs/integration/pdp-payments.md): Guide for integrating PDP with Payments
 - [System Diagrams](docs/diagrams.md): Visual representations of system architecture and workflows
-- [Hot Vault Example](docs/examples/hot-vault.md): Example implementation
+- [Hot Vault Examples](docs/examples/hot-vault.md): Complete storage application examples
+  - [Traditional Hot Vault](docs/examples/hot-vault.md): Docker-based reference implementation
+  - [Wagmi-Vercel Hot Vault](docs/examples/wagmi-vercel-hotvault.md): Modern serverless Web3 application
 
 ## Deployed Contracts
 
-### Mainnet
+**📋 Complete Contract Reference**: [Contracts Reference Guide](docs/contracts-reference.md)
 
-- **PDP Verifier**: `0x9C65E8E57C98cCc040A3d825556832EA1e9f4Df6`
-- **PDP Service**: `0x805370387fA5Bd8053FD8f7B2da4055B9a4f8019`
+### Quick Reference
+
+**Filecoin Calibration Testnet** (for development):
+- **PDP Verifier**: `0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC`
+- **Payments Contract**: `0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A`
+- **USDFC Token**: `0xb3042734b608a1B16e9e86B374A3f3e389B4cDf0`
+
+**Filecoin Mainnet** (for production):
 - **Payments Contract**: `0x8BA1f109551bD432803012645Ac136ddd64DBA72`
 
-### Calibration Testnet
-
-- **PDP Verifier**: `0x5A23b7df87f59A291C26A2A1d684AD03Ce9B68DC`
-- **PDP Service**: `0x6170dE2b09b404776197485F3dc6c968Ef948505`
-- **Payments Contract**: `0xc5e1333D3cD8a3F1f8A9f9A116f166cBD0bA307A`
-
-## Contributing
-
-We welcome contributions to the documentation! Please see our [contribution guidelines](docs/contributing.md) for more information.
-
-## License
-
-This documentation is licensed under [MIT License](LICENSE).
+For complete contract information, ABIs, network configuration, and integration examples, see the [Contracts Reference Guide](docs/contracts-reference.md).
